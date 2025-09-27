@@ -1,7 +1,7 @@
 // pages/checkout/index.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -79,7 +79,7 @@ const X402_ENDPOINT = 'https://polygon-facilitator.vercel.app';
 // Payment recipient address
 const PAYMENT_RECIPIENT = '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32';
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { address, isConnected, chainId } = useAccount();
@@ -609,5 +609,20 @@ export default function CheckoutPage() {
         {renderConnectionStatus()}
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-mono">Loading checkout...</p>
+        </div>
+      </div>
+    }>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
