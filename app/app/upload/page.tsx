@@ -58,6 +58,7 @@ interface PaymentData {
   validUpto: number;
   txHash: string;
   AmountPaid: string;
+  bidAmount?: string;
   payerAddress: string;
   recieverAddress: string;
 }
@@ -80,6 +81,7 @@ function UploadPageContent() {
     // First try to get from URL parameters (from checkout redirect)
     const slotId = searchParams.get('slotId');
     const price = searchParams.get('price');
+    const bidAmount = searchParams.get('bidAmount');
     const size = searchParams.get('size');
     const category = searchParams.get('category');
     const transactionHash = searchParams.get('transactionHash');
@@ -93,7 +95,8 @@ function UploadPageContent() {
         index: `${slotId}-${Date.now()}`, // Generate unique index
         validUpto,
         txHash: transactionHash || `pending-${Date.now()}`, // Use pending if no tx hash
-        AmountPaid: price,
+        AmountPaid: bidAmount || price, // Use bid amount if provided, otherwise use base price
+        bidAmount: bidAmount || undefined, // Store bid amount separately
         payerAddress: walletAddress,
         recieverAddress: '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32' // Your recipient address
       });
@@ -307,7 +310,14 @@ function UploadPageContent() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Amount:</span>
-                <span className="text-foreground">{paymentInfo.price} USDC</span>
+                <span className="text-foreground">
+                  {paymentData.bidAmount || paymentInfo.price} USDC
+                  {paymentData.bidAmount && paymentData.bidAmount !== paymentInfo.price && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      (bid)
+                    </span>
+                  )}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Size:</span>

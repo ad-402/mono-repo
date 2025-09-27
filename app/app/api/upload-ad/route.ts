@@ -23,15 +23,18 @@ export async function POST(request: NextRequest) {
     console.log('Payment data:', paymentData);
 
     // Calculate duration based on payment info or default to 1 hour
-    const durationMinutes = 60; // Default to 1 hour, you can make this configurable
+    // You can make this configurable based on the selected duration in paymentInfo
+    const durationMinutes = 60; // Default to 1 hour
 
-    // Create ad placement
+    // Create ad placement (with optional bidding)
+    const bidAmount = paymentData.bidAmount || paymentData.AmountPaid;
     const placementHash = await storeAdPlacement(
       slotId,
       paymentData.payerAddress,
       mediaHash,
       paymentData.AmountPaid,
-      durationMinutes
+      durationMinutes,
+      bidAmount
     );
 
     console.log('Ad placement created successfully:', placementHash);

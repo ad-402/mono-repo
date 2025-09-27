@@ -8,6 +8,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 // Simple SVG icons
 const WalletIcon = ({ className }: { className?: string }) => (
@@ -47,6 +49,14 @@ interface PaymentInfo {
   category: string;
 }
 
+interface QueueInfo {
+  slotId: string;
+  position: number;
+  totalInQueue: number;
+  nextActivation?: string;
+  isAvailable: boolean;
+}
+
 // USDC contract addresses and details
 const USDC_CONFIG = {
   "137": {
@@ -77,6 +87,9 @@ export default function CheckoutPage() {
   const { data: walletClient } = useWalletClient();
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ type: 'idle', message: '' });
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
+  const [queueInfo, setQueueInfo] = useState<QueueInfo | null>(null);
+  const [bidAmount, setBidAmount] = useState<string>('');
+  const [isBidding, setIsBidding] = useState<boolean>(false);
 
   // Parse payment information from URL parameters
   useEffect(() => {
@@ -94,8 +107,28 @@ export default function CheckoutPage() {
         durations,
         category
       });
+      
+      // Initialize bid amount with base price
+      setBidAmount(price);
+      
+      // Fetch queue information
+      fetchQueueInfo(slotId);
     }
   }, [searchParams]);
+
+  // Fetch queue information for the slot
+  const fetchQueueInfo = async (slotId: string) => {
+    try {
+      const response = await fetch(`/api/queue-info/${slotId}`);
+      if (response.ok) {
+        const queueData = await response.json();
+        setQueueInfo(queueData);
+        setIsBidding(!queueData.isAvailable);
+      }
+    } catch (error) {
+      console.error('Error fetching queue info:', error);
+    }
+  };
 
   // Handle wallet disconnection
   const handleDisconnect = () => {
@@ -130,12 +163,16 @@ export default function CheckoutPage() {
     try {
       setConnectionStatus({ type: 'loading', message: 'Preparing payment...' });
       
+      // Calculate final amount (bid amount or base price)
+      const finalAmount = isBidding ? bidAmount : paymentInfo.price;
+      
       // Generate EIP-3009 signature
       const signatureData = await generateEIP3009Signature(
         walletClient,
         address,
         paymentInfo,
-        chainId
+        chainId,
+        finalAmount
       );
       
       setConnectionStatus({ type: 'loading', message: 'Processing payment...' });
@@ -164,7 +201,7 @@ export default function CheckoutPage() {
         scheme: 'exact',
         network: x402Network,
         payTo: PAYMENT_RECIPIENT,
-        maxAmountRequired: (parseFloat(paymentInfo.price) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
+        maxAmountRequired: (parseFloat(finalAmount) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
         maxTimeoutSeconds: 3600,
         asset: signatureData.usdcConfig.address,
         resource: `https://ad402.io/slot/${paymentInfo.slotId}`,
@@ -202,7 +239,8 @@ export default function CheckoutPage() {
         index: paymentInfo.slotId,
         validUpto: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days
         txHash: settlementResult.transactionHash || settlementResult.hash,
-        AmountPaid: (parseFloat(paymentInfo.price) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
+        AmountPaid: (parseFloat(finalAmount) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
+        bidAmount: finalAmount,
         payerAddress: address,
         recieverAddress: PAYMENT_RECIPIENT
       };
@@ -228,6 +266,7 @@ export default function CheckoutPage() {
           const uploadParams = new URLSearchParams({
             slotId: paymentInfo.slotId,
             price: paymentInfo.price,
+            bidAmount: finalAmount, // Include the bid amount
             size: paymentInfo.size,
             category: paymentInfo.category,
             transactionHash: settlementResult.transactionHash || settlementResult.hash || '',
@@ -260,7 +299,8 @@ export default function CheckoutPage() {
     walletClient: any, 
     userAddress: string, 
     paymentInfo: PaymentInfo, 
-    chainId: number
+    chainId: number,
+    finalAmount: string
   ) => {
     const usdcConfig = USDC_CONFIG[chainId.toString() as keyof typeof USDC_CONFIG];
     
@@ -292,8 +332,8 @@ export default function CheckoutPage() {
     const nonce = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(32)))
       .map(b => b.toString(16).padStart(2, '0')).join('');
     
-    // Convert amount to wei (6 decimals for USDC)
-    const value = (parseFloat(paymentInfo.price) * Math.pow(10, usdcConfig.decimals)).toString();
+    // Convert final amount to wei (6 decimals for USDC)
+    const value = (parseFloat(finalAmount) * Math.pow(10, usdcConfig.decimals)).toString();
     
     // Time validity
     const currentTime = Math.floor(Date.now() / 1000);
@@ -412,6 +452,93 @@ export default function CheckoutPage() {
           </Card>
         )}
 
+        {/* Queue Information Card */}
+        {queueInfo && (
+          <Card className="mb-6 border-border bg-card">
+            <CardContent className="p-6">
+              <div className="text-center mb-4">
+                <h3 className="font-mono font-semibold text-foreground text-sm mb-2">
+                  {queueInfo.isAvailable ? 'Slot Available' : 'Slot Occupied'}
+                </h3>
+                {!queueInfo.isAvailable && (
+                  <div className="space-y-2 text-xs font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Queue Position:</span>
+                      <span className="text-foreground">{queueInfo.position + 1}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total in Queue:</span>
+                      <span className="text-foreground">{queueInfo.totalInQueue}</span>
+                    </div>
+                    {queueInfo.nextActivation && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Next Available:</span>
+                        <span className="text-foreground">
+                          {new Date(queueInfo.nextActivation).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Bidding Section */}
+        {paymentInfo && (
+          <Card className="mb-6 border-border bg-card">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="font-mono font-semibold text-foreground text-sm mb-2">
+                    {isBidding ? 'Bid Amount' : 'Purchase Amount'}
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-mono">
+                    {isBidding 
+                      ? 'Higher bids get priority in the queue' 
+                      : 'Slot is available for immediate purchase'
+                    }
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bidAmount" className="text-sm font-mono text-foreground">
+                    Amount (USDC)
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="bidAmount"
+                      type="number"
+                      step="0.01"
+                      min={paymentInfo.price}
+                      value={bidAmount}
+                      onChange={(e) => setBidAmount(e.target.value)}
+                      className="font-mono pr-12"
+                      placeholder={paymentInfo.price}
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground font-mono">
+                      USDC
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-mono">
+                    Minimum: {paymentInfo.price} USDC
+                  </p>
+                </div>
+
+                {isBidding && (
+                  <div className="p-3 bg-secondary border border-border">
+                    <p className="text-xs font-mono text-muted-foreground">
+                      💡 <strong>Bidding Tip:</strong> Higher bids get better queue positions. 
+                      Your ad will automatically activate when it's your turn.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Wallet Connection Card */}
         <Card className="mb-6">
           <CardContent className="p-6">
@@ -456,7 +583,12 @@ export default function CheckoutPage() {
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
                       disabled={connectionStatus.type === 'loading' || !isSupportedNetwork()}
                     >
-                      {connectionStatus.type === 'loading' ? 'Processing...' : `Pay ${paymentInfo.price} USDC`}
+                      {connectionStatus.type === 'loading' 
+                        ? 'Processing...' 
+                        : isBidding 
+                          ? `Bid ${bidAmount} USDC` 
+                          : `Pay ${bidAmount} USDC`
+                      }
                     </Button>
                     
                     <Button

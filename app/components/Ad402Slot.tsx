@@ -28,6 +28,12 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
   const [adContent, setAdContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasAd, setHasAd] = useState(false);
+  const [queueInfo, setQueueInfo] = useState<{
+    position: number;
+    totalInQueue: number;
+    nextActivation?: string;
+    isAvailable: boolean;
+  } | null>(null);
 
   // Function to fetch ad content
   const fetchAdContent = async () => {
@@ -56,6 +62,19 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
     }
   };
 
+  // Function to fetch queue information
+  const fetchQueueInfo = async () => {
+    try {
+      const response = await fetch(`/api/queue-info/${slotId}`);
+      if (response.ok) {
+        const queueData = await response.json();
+        setQueueInfo(queueData);
+      }
+    } catch (error) {
+      console.error('Error fetching queue info:', error);
+    }
+  };
+
   useEffect(() => {
     if (slotRef.current) {
       slotRef.current.setAttribute('data-slot-id', slotId);
@@ -65,8 +84,9 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
       slotRef.current.setAttribute('data-category', category);
     }
     
-    // Fetch ad content when component mounts
-    fetchAdContent();
+          // Fetch ad content and queue info when component mounts
+          fetchAdContent();
+          fetchQueueInfo();
   }, [slotId, size, price, durations, category]);
 
   const handleSlotClick = () => {
@@ -113,47 +133,92 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
     );
   }
 
-  // If ad exists, show the ad
-  if (hasAd && adContent) {
-    return (
-      <div
-        ref={slotRef}
-        className={`ad402-slot ${className}`}
-        style={{
-          width: dimensions.width,
-          height: dimensions.height,
-          maxWidth: '100%',
-          maxHeight: '100%',
-          border: '2px solid hsl(var(--border))',
-          backgroundColor: 'hsl(var(--background))',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          position: 'relative',
-          margin: '0 auto'
-        }}
-      >
-        <img
-          src={adContent}
-          alt="Advertisement"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            cursor: 'pointer'
-          }}
-          onClick={() => {
-            // Track ad click if needed
-            console.log(`Ad clicked: ${slotId}`);
-          }}
-          onError={() => {
-            // If image fails to load, fall back to placeholder
-            setHasAd(false);
-            setAdContent(null);
-          }}
-        />
-      </div>
-    );
-  }
+        // If ad exists, show the ad with "Book Next Slot" button
+        if (hasAd && adContent) {
+          return (
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <div
+                ref={slotRef}
+                className={`ad402-slot ${className}`}
+                style={{
+                  width: dimensions.width,
+                  height: dimensions.height,
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  border: '2px solid hsl(var(--border))',
+                  backgroundColor: 'hsl(var(--background))',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  margin: '0 auto'
+                }}
+              >
+                <img
+                  src={adContent}
+                  alt="Advertisement"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    // Track ad click if needed
+                    console.log(`Ad clicked: ${slotId}`);
+                  }}
+                  onError={() => {
+                    // If image fails to load, fall back to placeholder
+                    setHasAd(false);
+                    setAdContent(null);
+                  }}
+                />
+              </div>
+              
+              {/* Book Next Slot Button */}
+              {clickable && (
+                <button
+                  onClick={handleSlotClick}
+                  style={{
+                    position: 'absolute',
+                    top: '-8px',
+                    right: '-8px',
+                    minWidth: '24px',
+                    height: '24px',
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'hsl(var(--primary-foreground))',
+                    border: 'none',
+                    borderRadius: '0',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.2s ease',
+                    zIndex: 10,
+                    padding: queueInfo && queueInfo.totalInQueue > 0 ? '0 6px' : '0'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'hsl(var(--primary) / 0.9)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'hsl(var(--primary))';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title={queueInfo && queueInfo.totalInQueue > 0 
+                    ? `Book next slot (${queueInfo.totalInQueue} in queue)` 
+                    : "Book next slot"
+                  }
+                >
+                  {queueInfo && queueInfo.totalInQueue > 0 ? queueInfo.totalInQueue : '+'}
+                </button>
+              )}
+            </div>
+          );
+        }
 
   // Show placeholder slot for purchase
   return (
@@ -200,12 +265,17 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
         <div style={{ fontSize: fontSizes.subtitle, marginBottom: '1px', lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
           {price} USDC • {size}
         </div>
+        {queueInfo && !queueInfo.isAvailable && (
+          <div style={{ fontSize: fontSizes.small, marginBottom: '1px', lineHeight: '1.1', color: 'hsl(var(--primary))', fontWeight: 'bold' }}>
+            {queueInfo.totalInQueue} in queue
+          </div>
+        )}
         <div style={{ fontSize: fontSizes.small, marginBottom: '1px', lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
           Polygon USDC
         </div>
         {clickable && (
           <div style={{ fontSize: fontSizes.small, lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
-            Click to purchase
+            {queueInfo && !queueInfo.isAvailable ? 'Click to bid' : 'Click to purchase'}
           </div>
         )}
       </div>

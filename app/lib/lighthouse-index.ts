@@ -209,7 +209,7 @@ export async function initializeDefaultSlots(): Promise<void> {
         };
 
         const buffer = Buffer.from(JSON.stringify(dataToStore, null, 2));
-        const uploadResponse = await lighthouse.uploadBuffer(buffer, LIGHTHOUSE_API_KEY);
+        const uploadResponse = await lighthouse.uploadBuffer(buffer, LIGHTHOUSE_API_KEY!);
 
         if (uploadResponse && uploadResponse.data && uploadResponse.data.Hash) {
           const slotHash = uploadResponse.data.Hash;
