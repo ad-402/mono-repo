@@ -341,19 +341,19 @@ export default function CheckoutPage() {
     if (connectionStatus.type === 'idle') return null;
 
     const statusClasses = {
-      loading: 'bg-blue-50 border-blue-200 text-blue-800',
-      success: 'bg-green-50 border-green-200 text-green-800',
-      error: 'bg-red-50 border-red-200 text-red-800'
+      loading: 'bg-secondary border-border text-foreground',
+      success: 'bg-secondary border-border text-foreground',
+      error: 'bg-secondary border-border text-foreground'
     };
 
     const icons = {
-      loading: <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />,
+      loading: <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent" />,
       success: <CheckCircleIcon className="w-5 h-5" />,
       error: <ExclamationTriangleIcon className="w-5 h-5" />
     };
 
     return (
-      <div className={`${statusClasses[connectionStatus.type]} border px-4 py-3 rounded-lg flex items-center gap-3`}>
+      <div className={`${statusClasses[connectionStatus.type]} border px-4 py-3 flex items-center gap-3 font-mono`}>
         {icons[connectionStatus.type]}
         <span>{connectionStatus.message}</span>
       </div>
@@ -361,69 +361,69 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button
             onClick={() => router.back()}
             variant="outline"
-            className="mb-4"
+            className="mb-4 font-mono"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-mono font-bold text-foreground mb-2">
             USDC Payment Authorization
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground font-mono">
             Sign USDC payment authorization on Polygon
           </p>
         </div>
 
         {/* Payment Information Card */}
         {paymentInfo && (
-          <Card className="mb-6 border-blue-200 bg-blue-50">
+          <Card className="mb-6 border-border bg-card">
             <CardHeader>
-              <CardTitle className="text-blue-800">Payment Details</CardTitle>
-              <CardDescription className="text-blue-600">
+              <CardTitle className="text-card-foreground font-mono">Payment Details</CardTitle>
+              <CardDescription className="text-muted-foreground font-mono">
                 Review the details before signing
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="font-medium text-blue-800">Slot ID:</span>
-                  <span className="text-blue-600 font-mono">{paymentInfo.slotId}</span>
+                  <span className="font-mono font-medium text-card-foreground">Slot ID:</span>
+                  <span className="text-muted-foreground font-mono">{paymentInfo.slotId}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium text-blue-800">Size:</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  <span className="font-mono font-medium text-card-foreground">Size:</span>
+                  <Badge variant="outline" className="text-muted-foreground border-border font-mono">
                     {paymentInfo.size}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium text-blue-800">Category:</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  <span className="font-mono font-medium text-card-foreground">Category:</span>
+                  <Badge variant="outline" className="text-muted-foreground border-border font-mono">
                     {paymentInfo.category}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium text-blue-800">Token:</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  <span className="font-mono font-medium text-card-foreground">Token:</span>
+                  <Badge variant="outline" className="text-muted-foreground border-border font-mono">
                     USDC
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-medium text-blue-800">Network:</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  <span className="font-mono font-medium text-card-foreground">Network:</span>
+                  <Badge variant="outline" className="text-muted-foreground border-border font-mono">
                     Polygon
                   </Badge>
                 </div>
-                <div className="border-t border-blue-200 pt-3">
+                <div className="border-t border-border pt-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg text-blue-800">Amount:</span>
-                    <span className="font-bold text-xl text-blue-600">
+                    <span className="font-mono font-bold text-lg text-card-foreground">Amount:</span>
+                    <span className="font-mono font-bold text-xl text-foreground">
                       {paymentInfo.price} USDC
                     </span>
                   </div>
@@ -436,16 +436,16 @@ export default function CheckoutPage() {
         {/* Wallet Connection Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Connect Your Wallet</CardTitle>
-            <CardDescription>
+            <CardTitle className="font-mono">Connect Your Wallet</CardTitle>
+            <CardDescription className="font-mono">
               Connect your wallet to sign the USDC payment authorization
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!isConnected ? (
               <div className="text-center">
-                <WalletIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">
+                <WalletIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4 font-mono">
                   Connect your wallet to continue
                 </p>
                 <div className="flex justify-center">
@@ -454,12 +454,12 @@ export default function CheckoutPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-secondary border border-border">
                   <div className="flex items-center gap-3">
-                    <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                    <CheckCircleIcon className="w-5 h-5 text-foreground" />
                     <div>
-                      <p className="font-semibold text-green-800">Wallet Connected</p>
-                      <p className="text-sm text-green-600 font-mono">
+                      <p className="font-mono font-semibold text-foreground">Wallet Connected</p>
+                      <p className="text-sm text-muted-foreground font-mono">
                         {formatAddress(address || '')}
                       </p>
                     </div>
@@ -468,18 +468,18 @@ export default function CheckoutPage() {
 
                 {/* Network Info */}
                 {chainId && (
-                  <div className={`p-3 border rounded-lg ${
+                  <div className={`p-3 border ${
                     isSupportedNetwork() 
-                      ? 'bg-green-50 border-green-200' 
-                      : 'bg-yellow-50 border-yellow-200'
+                      ? 'bg-secondary border-border' 
+                      : 'bg-secondary border-border'
                   }`}>
-                    <p className={`text-sm ${
-                      isSupportedNetwork() ? 'text-green-800' : 'text-yellow-800'
+                    <p className={`text-sm font-mono ${
+                      isSupportedNetwork() ? 'text-foreground' : 'text-muted-foreground'
                     }`}>
                       <span className="font-semibold">Network:</span> {getNetworkName(chainId)}
                     </p>
                     {!isSupportedNetwork() && (
-                      <p className="text-yellow-600 text-xs mt-1">
+                      <p className="text-muted-foreground text-xs mt-1 font-mono">
                         ⚠️ Please switch to Polygon Amoy (80002) or Polygon Mainnet (137)
                       </p>
                     )}
@@ -488,12 +488,12 @@ export default function CheckoutPage() {
 
                 {/* Sign & Pay Button */}
                 {paymentInfo && (
-                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                    <h4 className="font-semibold text-purple-800 mb-2">Ready to Sign?</h4>
-                    <p className="text-purple-700 text-sm mb-3">
+                  <div className="p-4 bg-secondary border border-border">
+                    <h4 className="font-mono font-semibold text-foreground mb-2">Ready to Sign?</h4>
+                    <p className="text-muted-foreground text-sm mb-3 font-mono">
                       You will sign an EIP-3009 USDC payment authorization for <strong>{paymentInfo.price} USDC</strong>.
                     </p>
-                    <div className="text-purple-600 text-xs mb-3 space-y-1">
+                    <div className="text-muted-foreground text-xs mb-3 space-y-1 font-mono">
                       <p>• No gas fees required for signing</p>
                       <p>• USDC contract: {chainId && USDC_CONFIG[chainId.toString() as keyof typeof USDC_CONFIG]?.address.slice(0, 10)}...</p>
                       <p>• Recipient: {PAYMENT_RECIPIENT.slice(0, 10)}...</p>
@@ -501,7 +501,7 @@ export default function CheckoutPage() {
                     </div>
                     <Button
                       onClick={handleSignAndPay}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono"
                       disabled={connectionStatus.type === 'loading' || !isSupportedNetwork()}
                     >
                       {connectionStatus.type === 'loading' ? 'Processing...' : 'Sign USDC Authorization'}
@@ -513,7 +513,7 @@ export default function CheckoutPage() {
                 <Button
                   onClick={handleDisconnect}
                   variant="outline"
-                  className="w-full"
+                  className="w-full font-mono"
                 >
                   Disconnect Wallet
                 </Button>
@@ -529,14 +529,14 @@ export default function CheckoutPage() {
         <Card className="mt-8">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <WalletIcon className="w-5 h-5 text-blue-600 mt-0.5" />
+              <WalletIcon className="w-5 h-5 text-foreground mt-0.5" />
               <div>
-                <h4 className="font-semibold text-blue-800 mb-1">EIP-3009 USDC Authorization</h4>
-                <p className="text-sm text-blue-700">
+                <h4 className="font-mono font-semibold text-foreground mb-1">EIP-3009 USDC Authorization</h4>
+                <p className="text-sm text-muted-foreground font-mono">
                   You'll sign an EIP-3009 transferWithAuthorization message for USDC on Polygon. 
                   This is gasless and only authorizes the payment - no tokens are transferred during signing.
                 </p>
-                <div className="mt-2 text-xs text-blue-600">
+                <div className="mt-2 text-xs text-muted-foreground font-mono">
                   <p>• Supported networks: Polygon Mainnet (137), Polygon Amoy (80002)</p>
                   <p>• Token: USDC with 6 decimal places</p>
                   <p>• Authorization expires in 1 hour</p>

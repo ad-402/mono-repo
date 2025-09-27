@@ -50,34 +50,57 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
   };
 
   const dimensions = getDimensions(size);
+  const fontSizes = getOptimalFontSizes(dimensions);
 
   return (
     <div
       ref={slotRef}
-      className={`ad402-slot ${className} ${clickable ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
+      className={`ad402-slot ${className} ${clickable ? 'cursor-pointer hover:bg-secondary transition-colors' : ''}`}
       onClick={handleSlotClick}
       style={{
         width: dimensions.width,
         height: dimensions.height,
-        border: '2px dashed #ddd',
-        borderRadius: '8px',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        border: '2px dashed hsl(var(--border))',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f9f9f9'
+        backgroundColor: 'hsl(var(--background))',
+        padding: '4px',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        position: 'relative',
+        margin: '0 auto'
       }}
     >
-      <div style={{ textAlign: 'center', color: '#666' }}>
-        <div style={{ fontSize: '24px', marginBottom: '8px' }}>💳</div>
-        <div>Ad Slot: {slotId}</div>
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>
+      <div
+        style={{ 
+          textAlign: 'center', 
+          color: 'hsl(var(--foreground))',
+          fontFamily: 'JetBrains Mono, monospace',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}
+      >
+        <div style={{ fontSize: fontSizes.icon, marginBottom: '2px', lineHeight: '1' }}>💳</div>
+        <div style={{ fontSize: fontSizes.title, fontWeight: '600', marginBottom: '1px', lineHeight: '1.1' }}>
+          Ad Slot: {slotId}
+        </div>
+        <div style={{ fontSize: fontSizes.subtitle, marginBottom: '1px', lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
           {price} USDC • {size}
         </div>
-        <div style={{ fontSize: '10px', marginTop: '2px', color: '#999' }}>
+        <div style={{ fontSize: fontSizes.small, marginBottom: '1px', lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
           Polygon USDC
         </div>
         {clickable && (
-          <div style={{ fontSize: '12px', marginTop: '4px', color: '#999' }}>
+          <div style={{ fontSize: fontSizes.small, lineHeight: '1.1', color: 'hsl(var(--muted-foreground))' }}>
             Click to purchase
           </div>
         )}
@@ -92,10 +115,25 @@ function getDimensions(size: string) {
     leaderboard: { width: 728, height: 90 },
     square: { width: 300, height: 250 },
     sidebar: { width: 160, height: 600 },
-    mobile: { width: 320, height: 50 },
-    card: { width: 300, height: 200 }
+    mobile: { width: 320, height: 60 }, // Increased height for better content fit
+    card: { width: 300, height: 220 } // Increased height for better content fit
   };
   return dimensions[size as keyof typeof dimensions] || dimensions.banner;
+}
+
+function getOptimalFontSizes(dimensions: { width: number; height: number }) {
+  const { width, height } = dimensions;
+  const area = width * height;
+  
+  // Calculate font sizes based on slot dimensions
+  const baseSize = Math.min(width, height) * 0.08; // 8% of smallest dimension
+  
+  return {
+    icon: `${Math.max(12, Math.min(24, baseSize * 1.5))}px`,
+    title: `${Math.max(8, Math.min(14, baseSize))}px`,
+    subtitle: `${Math.max(7, Math.min(12, baseSize * 0.8))}px`,
+    small: `${Math.max(6, Math.min(10, baseSize * 0.7))}px`
+  };
 }
 
 // 4. utils/usdcService.ts

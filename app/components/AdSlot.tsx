@@ -75,7 +75,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
       banner: { width: '728px', height: '90px' },
       sidebar: { width: '160px', height: '600px' },
       square: { width: '300px', height: '250px' },
-      mobile: { width: '320px', height: '50px' }
+      mobile: { width: '320px', height: '60px' } // Increased height for better content fit
     };
     return dimensions[size as keyof typeof dimensions] || dimensions.banner;
   };
@@ -86,7 +86,20 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     return (
       <div 
         className={`ad-slot loading ${className}`}
-        style={{ width, height }}
+        style={{ 
+          width, 
+          height,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          border: '2px dashed hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'JetBrains Mono, monospace'
+        }}
       >
         {AdFallbacks.createLoadingAd()}
       </div>
@@ -97,7 +110,20 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     return (
       <div 
         className={`ad-slot error ${className}`}
-        style={{ width, height }}
+        style={{ 
+          width, 
+          height,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          border: '2px dashed hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'JetBrains Mono, monospace'
+        }}
       >
         {AdFallbacks.createErrorAd(error)}
       </div>
@@ -108,12 +134,26 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     return (
       <div 
         className={`ad-slot paid ${className}`}
-        style={{ width, height }}
+        style={{ 
+          width, 
+          height,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          border: '2px solid hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background))'
+        }}
       >
         <img
           src={adContent}
           alt="Advertisement"
-          className="w-full h-full object-cover rounded cursor-pointer"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            cursor: 'pointer'
+          }}
           onError={() => {
             setError('Failed to load ad image');
             setAdContent(null);
@@ -135,7 +175,20 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   return (
     <div 
       className={`ad-slot fallback ${className}`}
-      style={{ width, height }}
+      style={{ 
+        width, 
+        height,
+        maxWidth: '100%',
+        maxHeight: '100%',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        border: '2px dashed hsl(var(--border))',
+        backgroundColor: 'hsl(var(--background))',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'JetBrains Mono, monospace'
+      }}
     >
       {fallbackContent || AdFallbacks.createPurchaseAd(route, position, size)}
     </div>
