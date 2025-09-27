@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { storeAdPlacement } from '@/lib/lighthouse-storage-simple';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,66 +18,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the ad slot
-    const adSlot = await prisma.adSlot.findFirst({
-      where: {
-        OR: [
-          { id: slotId },
-          { slotIdentifier: slotId }
-        ]
-      }
-    });
+    console.log('Creating ad placement for slot:', slotId);
+    console.log('Media hash:', mediaHash);
+    console.log('Payment data:', paymentData);
 
-    if (!adSlot) {
-      return NextResponse.json(
-        { error: 'Ad slot not found' },
-        { status: 404 }
-      );
-    }
-
-    // Calculate expiration time
+    // Calculate duration based on payment info or default to 1 hour
     const durationMinutes = 60; // Default to 1 hour, you can make this configurable
-    const startsAt = new Date();
-    const expiresAt = new Date(startsAt.getTime() + (durationMinutes * 60 * 1000));
 
     // Create ad placement
-    const placement = await prisma.adPlacement.create({
-      data: {
-        slotId: adSlot.id,
-        publisherId: adSlot.publisherId,
-        advertiserWallet: paymentData.payerAddress,
-        contentType: 'image',
-        contentUrl: `https://gateway.lighthouse.storage/ipfs/${mediaHash}`,
-        price: parseFloat(paymentData.AmountPaid),
-        currency: 'USDC',
-        durationMinutes: durationMinutes,
-        startsAt: startsAt,
-        expiresAt: expiresAt,
-        status: 'active',
-        moderationStatus: 'approved' // Auto-approve for now
-      }
-    });
+    const placementHash = await storeAdPlacement(
+      slotId,
+      paymentData.payerAddress,
+      mediaHash,
+      paymentData.AmountPaid,
+      durationMinutes
+    );
 
-    // Create ad content record
-    const content = await prisma.adContent.create({
-      data: {
-        placementId: placement.id,
-        type: 'image',
-        fileName: `ad-${placement.id}.jpg`,
-        filePath: `https://gateway.lighthouse.storage/ipfs/${mediaHash}`,
-        fileSize: 0, // We don't have this info from IPFS
-        mimeType: 'image/jpeg',
-        width: adSlot.width,
-        height: adSlot.height
-      }
-    });
+    console.log('Ad placement created successfully:', placementHash);
 
     return NextResponse.json({
       success: true,
       placement: {
-        id: placement.id,
-        contentUrl: content.filePath,
-        expiresAt: placement.expiresAt
+        hash: placementHash,
+        contentUrl: `https://gateway.lighthouse.storage/ipfs/${mediaHash}`,
+        expiresAt: new Date(Date.now() + durationMinutes * 60 * 1000).toISOString()
       }
     });
 
