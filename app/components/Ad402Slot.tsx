@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Ad402SlotProps {
   slotId: string;
@@ -10,6 +11,7 @@ interface Ad402SlotProps {
   category?: string;
   className?: string;
   autoRegister?: boolean;
+  clickable?: boolean;
 }
 
 export const Ad402Slot: React.FC<Ad402SlotProps> = ({
@@ -19,9 +21,11 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
   durations = ['30m', '1h', '6h', '24h'],
   category,
   className = '',
-  autoRegister = true
+  autoRegister = false,
+  clickable = true
 }) => {
   const slotRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (slotRef.current) {
@@ -34,24 +38,30 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
         slotRef.current.setAttribute('data-category', category);
       }
       
-      if (autoRegister) {
-        slotRef.current.setAttribute('data-register', 'true');
-      }
+      // Disable auto-registration to prevent Ad402 SDK modal conflicts
+      slotRef.current.setAttribute('data-register', 'false');
     }
   }, [slotId, size, price, durations, category, autoRegister]);
+
+  const handleSlotClick = () => {
+    if (clickable) {
+      router.push(`/ads/${slotId}`);
+    }
+  };
 
   const dimensions = getDimensions(size);
 
   return (
     <div
       ref={slotRef}
-      className={`ad402-slot ${className}`}
+      className={`ad402-slot ${className} ${clickable ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
       data-slot-id={slotId}
       data-size={size}
       data-price={price}
       data-durations={durations.join(',')}
       data-category={category}
-      data-register={autoRegister ? 'true' : 'false'}
+      data-register="false"
+      onClick={handleSlotClick}
       style={{
         width: dimensions.width,
         height: dimensions.height,
@@ -66,6 +76,11 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
       <div style={{ textAlign: 'center', color: '#666' }}>
         <div style={{ fontSize: '24px', marginBottom: '8px' }}>📢</div>
         <div>Loading ad slot...</div>
+        {clickable && (
+          <div style={{ fontSize: '12px', marginTop: '4px', color: '#999' }}>
+            Click to place bid
+          </div>
+        )}
       </div>
     </div>
   );

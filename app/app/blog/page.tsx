@@ -2,7 +2,7 @@ import { Ad402Provider, Ad402Slot } from '../../components/Ad402';
 
 export default function BlogDemo() {
   return (
-    <Ad402Provider publisherWallet="0x742d35cc6634c0532925a3b8d000b42d8e6c2f8">
+    <Ad402Provider publisherWallet="0x3c11A511598fFD31fE4f6E3BdABcC31D99C1bD10">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header Ad */}
         <div className="mb-8">

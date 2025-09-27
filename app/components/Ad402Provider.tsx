@@ -46,13 +46,14 @@ export const Ad402Provider: React.FC<Ad402ProviderProps> = ({
 
   return (
     <>
-      <Script
+      {/* Disabled Ad402 SDK to prevent modal conflicts with x402 */}
+      {/* <Script
         src="/js/ad402-sdk.js"
         strategy="beforeInteractive"
         onLoad={() => {
           console.log('Ad402 SDK loaded');
         }}
-      />
+      /> */}
       {children}
     </>
   );
