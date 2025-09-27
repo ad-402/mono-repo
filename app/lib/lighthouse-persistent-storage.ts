@@ -162,7 +162,7 @@ export async function storeAdPlacement(
     if (existingPlacement) {
       // Slot is occupied, add to queue
       await addToQueue(data, slotId, placement);
-      console.log(`Slot ${slotId} is occupied, added to queue. Queue position: ${getQueuePosition(data, slotId)}`);
+      console.log(`Slot ${slotId} is occupied, added to queue. Queue position: ${getQueuePosition(slotId)}`);
       await saveStorageData(data);
       return `queued-${placementId}`;
     } else {
