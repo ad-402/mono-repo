@@ -1,0 +1,46 @@
+{
+  "b54d3916c096dd30ee066dc005dfd737b2895e67ebd675abdd7658c3a6531c2d": {
+    "slotId": "header-banner",
+    "price": "0.25",
+    "size": "banner",
+    "category": "technology",
+    "walletAddress": "0x3c11A511598fFD31fE4f6E3BdABcC31D99C1bD10",
+    "network": "Polygon Amoy",
+    "transactionHash": "x402-payment-completed",
+    "expiresAt": "2025-09-27T21:39:41.828Z",
+    "used": true
+  },
+  "2ae704bddece75585bfa79513830cdd98f4117ae02bdc3e19f3ef6193b0585ea": {
+    "slotId": "header-banner",
+    "price": "0.25",
+    "size": "banner",
+    "category": "technology",
+    "walletAddress": "0x3c11A511598fFD31fE4f6E3BdABcC31D99C1bD10",
+    "network": "Polygon Amoy",
+    "transactionHash": "x402-payment-completed",
+    "expiresAt": "2025-09-27T21:39:41.830Z",
+    "used": false
+  },
+  "1bd30bc7fdf761114ec6f63fd2a2b0627762c584ba6e4de9cf90b9bd2d0f3d0d": {
+    "slotId": "header-banner",
+    "price": "0.25",
+    "size": "banner",
+    "category": "technology",
+    "walletAddress": "0x3c11A511598fFD31fE4f6E3BdABcC31D99C1bD10",
+    "network": "Polygon Amoy",
+    "transactionHash": "x402-payment-completed",
+    "expiresAt": "2025-09-27T21:43:51.274Z",
+    "used": false
+  },
+  "323366295eb449b15c3967e80d4fcfa574031a009f84f5b8cc7f9a33bc84f0fa": {
+    "slotId": "header-banner",
+    "price": "0.25",
+    "size": "banner",
+    "category": "technology",
+    "walletAddress": "0x3c11A511598fFD31fE4f6E3BdABcC31D99C1bD10",
+    "network": "Polygon Amoy",
+    "transactionHash": "x402-payment-completed",
+    "expiresAt": "2025-09-27T21:43:51.275Z",
+    "used": true
+  }
+}

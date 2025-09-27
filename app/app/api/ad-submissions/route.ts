@@ -136,3 +136,4 @@ function parseDuration(duration: string): number {
   
   return 60 * 60 * 1000; // Default 1 hour
 }
+

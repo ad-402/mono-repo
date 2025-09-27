@@ -2,15 +2,15 @@ import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google";
+import { JetBrains_Mono as FontMono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
 import { ToastContainer } from "react-toastify";
 import { cn } from "@/lib/utils";
 
-const fontSans = FontSans({
+const fontMono = FontMono({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-mono",
 });
 export const metadata: Metadata = {
   title: "Solidity Next.js Starter",
@@ -27,8 +27,8 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
+          "min-h-screen bg-background font-mono antialiased",
+          fontMono.variable,
         )}
       >
         <Providers>
