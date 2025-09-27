@@ -6,12 +6,12 @@ export const middleware = paymentMiddleware(
   {
     '/ads/[slotId]': {
       price: '$0.01', // Set the price for ad submission
-      network: "polygon-amoy", // Choose the appropriate network
+      network: "base-sepolia", // Choose the appropriate network
       config: {
         description: 'Payment for ad submission',
       },
     },
-    url: 'https://polygon-facilitator.vercel.app',
+    // url: 'https://polygon-facilitator.vercel.app',
   }
 );
 

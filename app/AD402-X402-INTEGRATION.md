@@ -45,15 +45,17 @@ export const middleware = paymentMiddleware(
 
 ### Environment Variables
 Make sure to set up your environment variables for:
-- Database connection
+- Lighthouse API key for IPFS storage
 - Wallet addresses
 - Network configuration
+
+See `LIGHTHOUSE-SETUP.md` for detailed setup instructions.
 
 ## API Routes
 
 ### New Routes Added:
 - `GET /api/ad-slots/[slotId]` - Fetch individual ad slot details
-- `POST /api/ad-placements` - Create ad placement (existing, updated for new flow)
+- `POST /api/ad-submissions` - Create ad submission with Lighthouse file upload (replaces Prisma-based route)
 
 ## Components
 
@@ -67,10 +69,9 @@ Make sure to set up your environment variables for:
 
 ## Testing
 
-Visit `/test-ads` to:
-- View existing ad slots
-- Create test slots
-- Test the complete bidding and payment flow
+Visit these test pages:
+- `/test-ads` - View existing ad slots and test the complete bidding flow
+- `/test-upload` - Test Lighthouse IPFS file upload functionality
 
 ## Usage Example
 
@@ -91,6 +92,7 @@ When users click on the slot, they'll be redirected to `/ads/slot-123` which req
 ## Dependencies
 
 - `x402-next`: For payment processing
+- `@lighthouse-web3/sdk`: For IPFS file storage
 - `react-hook-form`: For form handling
 - `@hookform/resolvers`: For form validation
 - `zod`: For schema validation
