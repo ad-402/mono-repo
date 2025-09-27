@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.4",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "x402": "^0.6.5"
