@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createTestAdWithShortExpiration } from '@/lib/lighthouse-storage-simple';
+import { createTestAdWithShortExpiration } from '@/lib/lighthouse-persistent-storage';
 
 export async function POST(request: NextRequest) {
   try {

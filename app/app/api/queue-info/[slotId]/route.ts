@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getQueueInfo } from '@/lib/lighthouse-storage-simple';
+import { getQueueInfo } from '@/lib/lighthouse-persistent-storage';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { slotId } = await params;
     
-    const queueInfo = getQueueInfo(slotId);
+    const queueInfo = await getQueueInfo(slotId);
     
     return NextResponse.json({
       slotId,

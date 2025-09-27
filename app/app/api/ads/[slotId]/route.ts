@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdPlacement } from '@/lib/lighthouse-storage-simple';
+import { getAdPlacement } from '@/lib/lighthouse-persistent-storage';
 
 // Default slot configurations
 const defaultSlots: Record<string, any> = {
@@ -9,7 +9,10 @@ const defaultSlots: Record<string, any> = {
   'header-banner': { size: 'banner', width: 728, height: 90 },
   'sidebar': { size: 'sidebar', width: 160, height: 600 },
   'mid-article': { size: 'square', width: 300, height: 250 },
-  'footer-banner': { size: 'banner', width: 728, height: 90 }
+  'footer-banner': { size: 'banner', width: 728, height: 90 },
+  'test-persistent': { size: 'banner', width: 728, height: 90 },
+  'test-persistent-key': { size: 'banner', width: 728, height: 90 },
+  'test-persistent-final': { size: 'banner', width: 728, height: 90 }
 };
 
 export async function GET(
