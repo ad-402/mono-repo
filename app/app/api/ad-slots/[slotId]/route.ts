@@ -5,11 +5,12 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slotId: string } }
+  { params }: { params: Promise<{ slotId: string }> }
 ) {
   try {
+    const { slotId } = await params;
     const slot = await prisma.adSlot.findUnique({
-      where: { id: params.slotId },
+      where: { id: slotId },
       include: {
         publisher: {
           select: {
