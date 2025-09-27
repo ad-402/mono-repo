@@ -10,6 +10,7 @@ export const hashRouter = Router();
  * POST /hashes
  * Body: { index, media_hash, validUpto, txHash, AmountPaid, payerAddress, recieverAddress }
  * Stores the record under the doc id equal to "index".
+ * Note: validUpto is user-specified Unix timestamp for ad expiration.
  */
 hashRouter.post('/', async (req, res) => {
   try {

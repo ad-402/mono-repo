@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Upload, CheckCircle, AlertCircle, Image, Video, FileText, ArrowLeft } from 'lucide-react';
 
-export default function TestUploadPage() {
+function TestUploadPageContent() {
   const searchParams = useSearchParams();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -308,5 +308,13 @@ export default function TestUploadPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TestUploadPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <TestUploadPageContent />
+    </Suspense>
   );
 }

@@ -33,7 +33,9 @@ export default function RootLayout({
       >
         <Providers>
           <Header />
-          {children}
+          <main>
+            {children}
+          </main>
         </Providers>
         <ToastContainer />
       </body>

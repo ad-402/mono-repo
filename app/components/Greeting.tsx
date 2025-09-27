@@ -81,7 +81,7 @@ const Greeting = () => {
               !address ||
               !newGreeting ||
               setGreetingLoading ||
-              prepareSetGreetingError
+              !!prepareSetGreetingError
             }
           >
             {!setGreetingLoading

@@ -114,7 +114,7 @@ export default function CheckoutPage() {
     return `Chain ${chainId}`;
   };
 
-  // Generate EIP-3009 signature and send to x402
+  // Generate EIP-3009 signature and settle payment
   const handleSignAndPay = async () => {
     if (!address || !paymentInfo || !walletClient || !chainId) return;
     
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         chainId
       );
       
-      setConnectionStatus({ type: 'loading', message: 'Sending to x402 settle endpoint...' });
+      setConnectionStatus({ type: 'loading', message: 'Settling payment on-chain...' });
       
       // Create x402 PaymentPayload and PaymentRequirements
       const x402Network = chainId === 137 ? 'polygon' : 'polygon-amoy';
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
       };
       
       // Send to x402 settle endpoint
-      const response = await fetch(`${X402_ENDPOINT}/settle`, {
+      const settlementResponse = await fetch(`${X402_ENDPOINT}/settle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,41 +184,58 @@ export default function CheckoutPage() {
         })
       });
       
-      const result = await response.json();
+      const settlementResult = await settlementResponse.json();
       
-      if (response.ok) {
-        setConnectionStatus({ 
-          type: 'success', 
-          message: `Payment settled successfully! TX: ${result.transactionHash || 'completed'}` 
-        });
-        
-        // Send success message to parent window if in iframe
-        if (window.parent !== window) {
-          window.parent.postMessage({
-            type: 'PAYMENT_SUCCESS',
-            signature: signatureData.signature,
-            paymentInfo,
-            chainId,
-            transactionHash: result.transactionHash,
-            result
-          }, '*');
-        }
+      console.log('Settlement result:', settlementResult);
+      
+      if (!settlementResponse.ok) {
+        throw new Error(settlementResult.error || 'Payment settlement failed');
+      }
 
-        // Redirect to upload page after successful payment
+      setConnectionStatus({ 
+        type: 'success', 
+        message: `Payment successful! Redirecting to upload page...` 
+      });
+
+      // Prepare payment data for upload page
+      const paymentData = {
+        index: paymentInfo.slotId,
+        validUpto: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days
+        txHash: settlementResult.transactionHash || settlementResult.hash,
+        AmountPaid: (parseFloat(paymentInfo.price) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
+        payerAddress: address,
+        recieverAddress: PAYMENT_RECIPIENT
+      };
+
+      // Store payment data in session storage for the upload page
+      sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
+      sessionStorage.setItem('paymentInfo', JSON.stringify(paymentInfo));
+      
+      // Send success message to parent window with payment data
+      if (window.parent !== window) {
+        window.parent.postMessage({
+          type: 'PAYMENT_SUCCESS',
+          signature: signatureData.signature,
+          paymentInfo,
+          chainId,
+          transactionHash: settlementResult.transactionHash,
+          paymentData,
+          redirectTo: '/upload'
+        }, '*');
+      } else {
+        // If not in iframe, redirect directly with parameters
         setTimeout(() => {
           const uploadParams = new URLSearchParams({
             slotId: paymentInfo.slotId,
             price: paymentInfo.price,
             size: paymentInfo.size,
             category: paymentInfo.category,
-            transactionHash: result.transactionHash || '',
+            transactionHash: settlementResult.transactionHash || settlementResult.hash || '',
             walletAddress: address || '',
             network: getNetworkName(chainId)
           });
-          router.push(`/test-upload?${uploadParams.toString()}`);
-        }, 2000); // Wait 2 seconds to show success message
-      } else {
-        throw new Error(result.error || 'Payment settlement failed');
+          router.push(`/upload?${uploadParams.toString()}`);
+        }, 2000);
       }
       
     } catch (error: any) {
