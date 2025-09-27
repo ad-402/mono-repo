@@ -14,9 +14,14 @@ const logger = pino({
 
 const app = express();
 
-// Basic hardening and CORS
+// Basic hardening and CORS - Allow all origins
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: false
+}));
 app.use(json({ limit: '1mb' }));
 
 // Health check
