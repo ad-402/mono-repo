@@ -4,7 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import pino from 'pino';
 import { json } from 'express';
-import { hashRouter } from './routes/hashes';
+import { hashRouter } from './routes/hashes.js';
 
 // Create a structured logger
 const logger = pino({

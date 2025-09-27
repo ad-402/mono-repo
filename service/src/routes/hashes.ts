@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { getDb, COLLECTION_NAME } from '../firebase';
+import { getDb, COLLECTION_NAME } from '../firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { HashRecord, hashRecordSchema, getSchema } from '../types';
+import { HashRecord, hashRecordSchema, getSchema } from '../types.js';
 
 export const hashRouter = Router();
 
