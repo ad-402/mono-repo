@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Home = () => {
   return (
-    <Ad402Provider publisherWallet="0x742d35cc6634c0532925a3b8d000b42d8e6c2f8">
+    <Ad402Provider publisherWallet="0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32">
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto px-4 py-16">

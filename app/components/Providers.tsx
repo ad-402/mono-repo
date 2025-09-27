@@ -1,17 +1,18 @@
+// 2. components/Providers.tsx
 "use client";
 
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { hardhat, sepolia } from "wagmi/chains";
+import { polygon, polygonAmoy } from "wagmi/chains";
 
 const queryClient = new QueryClient();
 
 const config = getDefaultConfig({
-  appName: "Solidity Next.js Starter",
+  appName: "X402 USDC Checkout",
   projectId: process.env.NEXT_PUBLIC_RAINBOWKIT_PROJECT_ID ?? "",
-  chains: [hardhat, sepolia],
+  chains: [polygonAmoy, polygon], // Polygon Amoy (testnet) and Polygon Mainnet
   ssr: true,
 });
 
