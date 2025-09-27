@@ -203,6 +203,20 @@ export default function CheckoutPage() {
             result
           }, '*');
         }
+
+        // Redirect to upload page after successful payment
+        setTimeout(() => {
+          const uploadParams = new URLSearchParams({
+            slotId: paymentInfo.slotId,
+            price: paymentInfo.price,
+            size: paymentInfo.size,
+            category: paymentInfo.category,
+            transactionHash: result.transactionHash || '',
+            walletAddress: address || '',
+            network: getNetworkName(chainId)
+          });
+          router.push(`/test-upload?${uploadParams.toString()}`);
+        }, 2000); // Wait 2 seconds to show success message
       } else {
         throw new Error(result.error || 'Payment settlement failed');
       }

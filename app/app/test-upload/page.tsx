@@ -1,18 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Upload, CheckCircle, AlertCircle, Image, Video, FileText } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Image, Video, FileText, ArrowLeft } from 'lucide-react';
 
 export default function TestUploadPage() {
+  const searchParams = useSearchParams();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentData, setPaymentData] = useState<any>(null);
+
+  // Extract payment data from URL parameters
+  useEffect(() => {
+    const slotId = searchParams.get('slotId');
+    const price = searchParams.get('price');
+    const size = searchParams.get('size');
+    const category = searchParams.get('category');
+    const transactionHash = searchParams.get('transactionHash');
+    const walletAddress = searchParams.get('walletAddress');
+    const network = searchParams.get('network');
+
+    if (slotId && price && size) {
+      setPaymentData({
+        slotId,
+        price,
+        size,
+        category: category || 'general',
+        transactionHash: transactionHash || '',
+        walletAddress: walletAddress || '',
+        network: network || 'Unknown'
+      });
+    }
+  }, [searchParams]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -24,21 +50,21 @@ export default function TestUploadPage() {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !paymentData) return;
 
     setUploading(true);
     setError(null);
 
     try {
       const formData = new FormData();
-      formData.append('slotId', 'test-slot-123');
-      formData.append('advertiserWallet', '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6');
-      formData.append('contentType', 'image');
+      formData.append('slotId', paymentData.slotId);
+      formData.append('advertiserWallet', paymentData.walletAddress);
+      formData.append('contentType', selectedFile.type.startsWith('image/') ? 'image' : 'video');
       formData.append('clickUrl', 'https://example.com');
-      formData.append('description', 'Test ad upload');
+      formData.append('description', `Ad for slot ${paymentData.slotId}`);
       formData.append('duration', '1h');
-      formData.append('price', '0.01');
-      formData.append('paymentHash', 'test-payment-hash');
+      formData.append('price', paymentData.price);
+      formData.append('paymentHash', paymentData.transactionHash);
       formData.append('adFile', selectedFile);
 
       const response = await fetch('/api/ad-submissions', {
@@ -78,19 +104,67 @@ export default function TestUploadPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Test File Upload</h1>
+          <Button
+            onClick={() => window.history.back()}
+            variant="outline"
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">Upload Advertisement</h1>
           <p className="text-gray-600 mt-2">
-            Test the Lighthouse IPFS file upload functionality
+            Upload your advertisement content for the purchased slot
           </p>
         </div>
+
+        {/* Payment Information Card */}
+        {paymentData && (
+          <Card className="mb-6 border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-green-800">Payment Successful</CardTitle>
+              <CardDescription className="text-green-600">
+                Your payment has been processed. Now upload your advertisement.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-green-800">Slot ID</Label>
+                  <p className="text-sm text-green-600 font-mono">{paymentData.slotId}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-green-800">Amount Paid</Label>
+                  <p className="text-sm text-green-600 font-bold">{paymentData.price} USDC</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-green-800">Size</Label>
+                  <Badge variant="outline" className="text-green-600 border-green-300">
+                    {paymentData.size}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-green-800">Network</Label>
+                  <p className="text-sm text-green-600">{paymentData.network}</p>
+                </div>
+              </div>
+              {paymentData.transactionHash && (
+                <div className="mt-4">
+                  <Label className="text-sm font-medium text-green-800">Transaction Hash</Label>
+                  <p className="text-sm text-green-600 font-mono break-all">{paymentData.transactionHash}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Upload Test File</CardTitle>
+              <CardTitle>Upload Advertisement</CardTitle>
               <CardDescription>
-                Select a file to test the Lighthouse IPFS upload
+                Select your advertisement file to upload to IPFS
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -140,10 +214,10 @@ export default function TestUploadPage() {
 
               <Button
                 onClick={handleUpload}
-                disabled={!selectedFile || uploading}
+                disabled={!selectedFile || uploading || !paymentData}
                 className="w-full"
               >
-                {uploading ? 'Uploading...' : 'Upload to IPFS'}
+                {uploading ? 'Uploading...' : 'Upload Advertisement'}
               </Button>
             </CardContent>
           </Card>
