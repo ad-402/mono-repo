@@ -183,21 +183,18 @@ function UploadPageContent() {
 
   // Store ad record in database
   const storeAdRecord = async (mediaHash: string): Promise<void> => {
-    if (!paymentData) throw new Error('Payment data not available');
+    if (!paymentData || !paymentInfo) throw new Error('Payment data not available');
 
     const adRecord = {
-      index: paymentData.index,
-      media_hash: mediaHash,
-      validUpto: paymentData.validUpto,
-      txHash: paymentData.txHash || `pending-${Date.now()}`,
-      AmountPaid: paymentData.AmountPaid,
-      payerAddress: paymentData.payerAddress,
-      recieverAddress: paymentData.recieverAddress
+      slotId: paymentInfo.slotId,
+      mediaHash: mediaHash,
+      paymentData: paymentData,
+      paymentInfo: paymentInfo
     };
 
     console.log('Storing ad record:', adRecord);
 
-    const response = await fetch(HASH_SERVICE_ENDPOINT, {
+    const response = await fetch('/api/upload-ad', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -218,19 +215,19 @@ function UploadPageContent() {
     if (!selectedFile || !paymentData) return;
 
     try {
-      setUploadStatus({ type: 'uploading', message: 'Uploading to Lighthouse...', progress: 0 });
+      setUploadStatus({ type: 'uploading', message: 'Uploading your ad...', progress: 0 });
 
       // Upload to Lighthouse
       const mediaHash = await uploadToLighthouse(selectedFile);
       setLighthouseHash(mediaHash);
       
-      setUploadStatus({ type: 'uploading', message: 'Upload successful! Storing ad record...', progress: 50 });
+      setUploadStatus({ type: 'uploading', message: 'Processing your ad...', progress: 50 });
 
       // Store in database
-      setUploadStatus({ type: 'storing', message: 'Storing ad record in database...', progress: 75 });
+      setUploadStatus({ type: 'storing', message: 'Finalizing...', progress: 75 });
       await storeAdRecord(mediaHash);
 
-      setUploadStatus({ type: 'success', message: 'Ad successfully uploaded and stored!', progress: 100 });
+      setUploadStatus({ type: 'success', message: 'Ad uploaded successfully!', progress: 100 });
 
       // Clean up session storage
       sessionStorage.removeItem('paymentData');
@@ -240,7 +237,7 @@ function UploadPageContent() {
       console.error('Upload failed:', error);
       setUploadStatus({ 
         type: 'error', 
-        message: error.message || 'Upload failed. Please try again.' 
+        message: 'Upload failed. Please try again.' 
       });
     }
   };
@@ -265,68 +262,56 @@ function UploadPageContent() {
 
   if (!paymentInfo || !paymentData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading payment information...</p>
+          <div className="animate-spin h-12 w-12 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
+          <p className="text-muted-foreground font-mono">Loading payment information...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button
             onClick={() => router.back()}
             variant="outline"
-            className="mb-4"
+            className="mb-6 font-mono"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-mono font-bold text-foreground mb-2">
             Upload Your Ad
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground font-mono text-sm">
             Upload your ad content to complete the process
           </p>
         </div>
 
         {/* Payment Summary Card */}
-        <Card className="mb-6 border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-800 flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5" />
-              Payment Confirmed
-            </CardTitle>
-            <CardDescription className="text-green-600">
-              Your payment has been processed successfully
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-green-800">Slot ID:</span>
-                <p className="text-green-600 font-mono">{paymentInfo.slotId}</p>
+        <Card className="mb-6 border-border bg-card">
+          <CardContent className="p-6">
+            <div className="text-center mb-4">
+              <CheckCircleIcon className="w-6 h-6 text-foreground mx-auto mb-2" />
+              <h3 className="font-mono font-semibold text-foreground text-sm">Payment Confirmed</h3>
+            </div>
+            
+            <div className="space-y-2 text-sm font-mono">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Slot:</span>
+                <span className="text-foreground">{paymentInfo.slotId}</span>
               </div>
-              <div>
-                <span className="font-medium text-green-800">Amount:</span>
-                <p className="text-green-600">{paymentInfo.price} USDC</p>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Amount:</span>
+                <span className="text-foreground">{paymentInfo.price} USDC</span>
               </div>
-              <div>
-                <span className="font-medium text-green-800">Size:</span>
-                <Badge variant="outline" className="text-green-600 border-green-300">
-                  {paymentInfo.size}
-                </Badge>
-              </div>
-              <div>
-                <span className="font-medium text-green-800">Valid Until:</span>
-                <p className="text-green-600">
-                  {new Date(paymentData.validUpto * 1000).toLocaleDateString()}
-                </p>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Size:</span>
+                <span className="text-foreground">{paymentInfo.size}</span>
               </div>
             </div>
           </CardContent>
@@ -334,26 +319,20 @@ function UploadPageContent() {
 
         {/* Upload Card */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Upload Ad Content</CardTitle>
-            <CardDescription>
-              Select an image file for your advertisement
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {!selectedFile ? (
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                className="border-2 border-dashed border-border p-8 text-center hover:border-foreground transition-colors cursor-pointer"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onClick={() => document.getElementById('fileInput')?.click()}
               >
-                <CloudUploadIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-lg font-medium text-gray-900 mb-2">
+                <CloudUploadIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-sm font-mono font-medium text-foreground mb-2">
                   Drop your image here or click to browse
                 </p>
-                <p className="text-gray-600">
-                  Supports JPG, PNG, GIF up to 5MB
+                <p className="text-xs text-muted-foreground font-mono">
+                  JPG, PNG, GIF up to 5MB
                 </p>
                 <input
                   id="fileInput"
@@ -366,18 +345,19 @@ function UploadPageContent() {
             ) : (
               <div className="space-y-4">
                 {/* Preview */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start gap-4">
-                    <ImageIcon className="w-12 h-12 text-blue-600" />
+                <div className="border border-border p-4">
+                  <div className="flex items-start gap-3">
+                    <ImageIcon className="w-8 h-8 text-foreground" />
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{selectedFile.name}</h4>
-                      <p className="text-sm text-gray-600">
+                      <h4 className="font-mono font-medium text-foreground text-sm">{selectedFile.name}</h4>
+                      <p className="text-xs text-muted-foreground font-mono">
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
+                      className="font-mono text-xs"
                       onClick={() => {
                         setSelectedFile(null);
                         setPreviewUrl(null);
@@ -392,7 +372,7 @@ function UploadPageContent() {
                       <img 
                         src={previewUrl} 
                         alt="Preview" 
-                        className="max-w-full h-48 object-cover rounded border"
+                        className="max-w-full h-32 object-cover border border-border"
                       />
                     </div>
                   )}
@@ -401,12 +381,12 @@ function UploadPageContent() {
                 {/* Upload Button */}
                 <Button
                   onClick={handleUpload}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
                   disabled={uploadStatus.type === 'uploading' || uploadStatus.type === 'storing'}
                 >
                   {uploadStatus.type === 'uploading' || uploadStatus.type === 'storing' 
                     ? 'Processing...' 
-                    : 'Upload to Lighthouse'
+                    : 'Upload Ad'
                   }
                 </Button>
               </div>
@@ -414,56 +394,25 @@ function UploadPageContent() {
           </CardContent>
         </Card>
 
-        {/* Progress */}
-        {uploadStatus.progress !== undefined && (
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Upload Progress</span>
-                  <span>{uploadStatus.progress}%</span>
-                </div>
-                <Progress value={uploadStatus.progress} />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Status Messages */}
         {uploadStatus.type !== 'idle' && (
-          <Card className={`mb-6 ${
-            uploadStatus.type === 'success' 
-              ? 'border-green-200 bg-green-50' 
-              : uploadStatus.type === 'error'
-              ? 'border-red-200 bg-red-50'
-              : 'border-blue-200 bg-blue-50'
-          }`}>
-            <CardContent className="pt-6">
+          <Card className="mb-6 border-border bg-card">
+            <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                {uploadStatus.type === 'success' && <CheckCircleIcon className="w-5 h-5 text-green-600" />}
-                {uploadStatus.type === 'error' && <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />}
+                {uploadStatus.type === 'success' && <CheckCircleIcon className="w-4 h-4 text-foreground" />}
+                {uploadStatus.type === 'error' && <ExclamationTriangleIcon className="w-4 h-4 text-foreground" />}
                 {(uploadStatus.type === 'uploading' || uploadStatus.type === 'storing') && 
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent" />
+                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent" />
                 }
-                <span className={
-                  uploadStatus.type === 'success' 
-                    ? 'text-green-800' 
-                    : uploadStatus.type === 'error'
-                    ? 'text-red-800'
-                    : 'text-blue-800'
-                }>
+                <span className="text-sm font-mono text-foreground">
                   {uploadStatus.message}
                 </span>
               </div>
               
-              {lighthouseHash && uploadStatus.type === 'success' && (
-                <div className="mt-3 p-3 bg-white border border-green-200 rounded text-sm">
-                  <p className="font-medium text-green-800 mb-1">IPFS Hash:</p>
-                  <p className="font-mono text-green-700 break-all">{lighthouseHash}</p>
-                  <p className="text-green-600 mt-2">
-                    Your ad is now live and will be displayed on the specified slot!
-                  </p>
-                </div>
+              {uploadStatus.type === 'success' && (
+                <p className="text-xs text-muted-foreground font-mono mt-2">
+                  Your ad is now live!
+                </p>
               )}
             </CardContent>
           </Card>
@@ -471,40 +420,13 @@ function UploadPageContent() {
 
         {/* Success Actions */}
         {uploadStatus.type === 'success' && (
-          <div className="flex gap-4">
-            <Button
-              onClick={() => router.push('/')}
-              className="flex-1"
-            >
-              Go to Homepage
-            </Button>
-            <Button
-              onClick={() => window.open(`https://gateway.lighthouse.storage/ipfs/${lighthouseHash}`, '_blank')}
-              variant="outline"
-              className="flex-1"
-            >
-              View on IPFS
-            </Button>
-          </div>
+          <Button
+            onClick={() => router.push('/')}
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
+          >
+            Go to Homepage
+          </Button>
         )}
-
-        {/* Info Card */}
-        <Card className="mt-8">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <CloudUploadIcon className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <h4 className="font-semibold text-blue-800 mb-1">Upload Process</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• Your image will be uploaded to Lighthouse (IPFS)</li>
-                  <li>• The content hash will be stored in our database</li>
-                  <li>• Your ad will be displayed on the purchased slot</li>
-                  <li>• The ad will remain active until the expiry date</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

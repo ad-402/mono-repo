@@ -1,7 +1,7 @@
 // 3. components/Ad402Slot.tsx
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Ad402SlotProps {
@@ -25,6 +25,36 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
 }) => {
   const slotRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [adContent, setAdContent] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasAd, setHasAd] = useState(false);
+
+  // Function to fetch ad content
+  const fetchAdContent = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Check if there's an ad for this slot
+      const response = await fetch(`/api/ads/${slotId}`);
+      
+      if (response.ok) {
+        const adData = await response.json();
+        if (adData.hasAd && adData.contentUrl) {
+          setAdContent(adData.contentUrl);
+          setHasAd(true);
+        } else {
+          setHasAd(false);
+        }
+      } else {
+        setHasAd(false);
+      }
+    } catch (error) {
+      console.error('Error fetching ad content:', error);
+      setHasAd(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (slotRef.current) {
@@ -34,6 +64,9 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
       slotRef.current.setAttribute('data-durations', durations.join(','));
       slotRef.current.setAttribute('data-category', category);
     }
+    
+    // Fetch ad content when component mounts
+    fetchAdContent();
   }, [slotId, size, price, durations, category]);
 
   const handleSlotClick = () => {
@@ -52,6 +85,77 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
   const dimensions = getDimensions(size);
   const fontSizes = getOptimalFontSizes(dimensions);
 
+  // If loading, show loading state
+  if (isLoading) {
+    return (
+      <div
+        ref={slotRef}
+        className={`ad402-slot ${className}`}
+        style={{
+          width: dimensions.width,
+          height: dimensions.height,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          border: '2px dashed hsl(var(--border))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'hsl(var(--background))',
+          padding: '4px',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          position: 'relative',
+          margin: '0 auto'
+        }}
+      >
+        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // If ad exists, show the ad
+  if (hasAd && adContent) {
+    return (
+      <div
+        ref={slotRef}
+        className={`ad402-slot ${className}`}
+        style={{
+          width: dimensions.width,
+          height: dimensions.height,
+          maxWidth: '100%',
+          maxHeight: '100%',
+          border: '2px solid hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background))',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          position: 'relative',
+          margin: '0 auto'
+        }}
+      >
+        <img
+          src={adContent}
+          alt="Advertisement"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            // Track ad click if needed
+            console.log(`Ad clicked: ${slotId}`);
+          }}
+          onError={() => {
+            // If image fails to load, fall back to placeholder
+            setHasAd(false);
+            setAdContent(null);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Show placeholder slot for purchase
   return (
     <div
       ref={slotRef}
@@ -75,7 +179,7 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
         margin: '0 auto'
       }}
     >
-      <div
+      <div 
         style={{ 
           textAlign: 'center', 
           color: 'hsl(var(--foreground))',

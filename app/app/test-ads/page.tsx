@@ -72,26 +72,26 @@ export default function TestAdsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading ad slots...</p>
+          <div className="animate-spin h-12 w-12 border-2 border-primary border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-muted-foreground font-mono">Loading ad slots...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Test Ad Slots</h1>
-          <p className="text-gray-600 mt-2">
-            Click on any ad slot to place a bid and test the x402 payment flow
+          <h1 className="text-2xl font-mono font-bold text-foreground">Test Ad Slots</h1>
+          <p className="text-muted-foreground font-mono text-sm mt-2">
+            Click on any ad slot to place a bid and test the payment flow
           </p>
           <Button 
             onClick={createTestSlot}
-            className="mt-4"
+            className="mt-4 font-mono"
             variant="outline"
           >
             Create Test Slot
@@ -99,15 +99,15 @@ export default function TestAdsPage() {
         </div>
 
         {slots.length === 0 ? (
-          <Card>
+          <Card className="border-border bg-card">
             <CardHeader>
-              <CardTitle>No Ad Slots Found</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-mono">No Ad Slots Found</CardTitle>
+              <CardDescription className="font-mono">
                 Create a test slot to get started
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={createTestSlot}>
+              <Button onClick={createTestSlot} className="font-mono">
                 Create Your First Test Slot
               </Button>
             </CardContent>
@@ -115,27 +115,27 @@ export default function TestAdsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {slots.map((slot) => (
-              <Card key={slot.id}>
+              <Card key={slot.id} className="border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">{slot.slotIdentifier}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-lg font-mono">{slot.slotIdentifier}</CardTitle>
+                  <CardDescription className="font-mono">
                     {slot.publisher.websiteDomain || 'Unknown website'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Size:</span>
-                      <span>{slot.size} ({slot.width}x{slot.height})</span>
+                    <div className="flex justify-between text-sm font-mono">
+                      <span className="text-muted-foreground">Size:</span>
+                      <span className="text-foreground">{slot.size} ({slot.width}x{slot.height})</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Price:</span>
-                      <span className="font-semibold">${slot.basePrice} USDC</span>
+                    <div className="flex justify-between text-sm font-mono">
+                      <span className="text-muted-foreground">Price:</span>
+                      <span className="font-semibold text-foreground">${slot.basePrice} USDC</span>
                     </div>
                     {slot.category && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Category:</span>
-                        <span>{slot.category}</span>
+                      <div className="flex justify-between text-sm font-mono">
+                        <span className="text-muted-foreground">Category:</span>
+                        <span className="text-foreground">{slot.category}</span>
                       </div>
                     )}
                   </div>
@@ -151,7 +151,7 @@ export default function TestAdsPage() {
                     />
                   </div>
                   
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground font-mono">
                     Click the slot above to place a bid
                   </div>
                 </CardContent>

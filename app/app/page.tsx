@@ -23,6 +23,12 @@ const Home = () => {
                 View Demo Blog
               </Link>
               <Link 
+                href="/example-ads" 
+                className="bg-background text-foreground px-8 py-3 border border-border hover:bg-secondary transition-colors font-mono"
+              >
+                See Ad Examples
+              </Link>
+              <Link 
                 href="/dashboard" 
                 className="bg-background text-foreground px-8 py-3 border border-border hover:bg-secondary transition-colors font-mono"
               >
