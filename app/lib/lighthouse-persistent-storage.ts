@@ -1,5 +1,5 @@
 // Persistent storage using Lighthouse/IPFS for production deployment
-import lighthouse from '@lighthouse-web3/sdk';
+// Note: lighthouse import is done dynamically to avoid build-time issues
 
 // Lighthouse API key
 const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY || process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY;
@@ -100,6 +100,9 @@ async function saveStorageData(data: StorageData): Promise<string> {
 
     data.lastUpdated = new Date().toISOString();
     const buffer = Buffer.from(JSON.stringify(data, null, 2));
+    
+    // Dynamic import of lighthouse
+    const lighthouse = (await import('@lighthouse-web3/sdk')).default;
     const uploadResponse = await lighthouse.uploadBuffer(buffer, LIGHTHOUSE_API_KEY);
 
     if (uploadResponse && uploadResponse.data && uploadResponse.data.Hash) {

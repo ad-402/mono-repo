@@ -11,6 +11,17 @@ async function getLighthouseStorage() {
   }
 }
 
+// Fallback storage for when Lighthouse is not available
+async function getFallbackStorage() {
+  try {
+    const { storeAdPlacementFallback } = await import('@/lib/fallback-storage');
+    return { storeAdPlacement: storeAdPlacementFallback };
+  } catch (error) {
+    console.error('Failed to import fallback storage:', error);
+    throw new Error('Fallback storage not available');
+  }
+}
+
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
@@ -73,10 +84,32 @@ export async function POST(request: NextRequest) {
         durationMinutes,
         bidAmount
       );
+      console.log('Successfully stored using Lighthouse persistent storage');
     } catch (lighthouseError) {
-      console.warn('Lighthouse storage failed, using fallback:', lighthouseError);
-      // Fallback: create a simple placement hash
-      placementHash = `fallback-placement-${slotId}-${Date.now()}`;
+      console.error('Lighthouse storage failed:', lighthouseError);
+      console.error('This should not happen in production. Check LIGHTHOUSE_API_KEY and network connectivity.');
+      
+      // Only use fallback in development or if absolutely necessary
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Using fallback storage in development mode only');
+        try {
+          const { storeAdPlacement } = await getFallbackStorage();
+          placementHash = await storeAdPlacement(
+            slotId,
+            paymentData.payerAddress,
+            mediaHash,
+            paymentData.AmountPaid,
+            durationMinutes,
+            bidAmount
+          );
+        } catch (fallbackError) {
+          console.error('Fallback storage also failed:', fallbackError);
+          placementHash = `simple-placement-${slotId}-${Date.now()}`;
+        }
+      } else {
+        // In production, fail if Lighthouse doesn't work
+        throw new Error('Lighthouse storage is required for production. Please check your configuration.');
+      }
     }
 
     console.log('Ad placement created successfully:', placementHash);
