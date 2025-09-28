@@ -36,6 +36,30 @@
     viem "^2.31.7"
     zustand "5.0.3"
 
+"@chainsafe/bls-hd-key@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@chainsafe/bls-hd-key/-/bls-hd-key-0.3.0.tgz#2de2649d5daa76f7460fc23caacf4ed3ebd2c02a"
+  integrity sha512-LsYYnfBEEmqGFPDm8hQN3Kc+v9wPFnhn+CToD403KEynUiUSHKLAf5B6UCY5eooShDOcaGCUgAUhIw1CmpEf3Q==
+  dependencies:
+    "@noble/hashes" "^1.0.0"
+
+"@chainsafe/bls-keygen@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@chainsafe/bls-keygen/-/bls-keygen-0.4.0.tgz#782c6555cfb05b9efa6f144d782799e8695ca1b0"
+  integrity sha512-wqtuj4G/sWpIugJW1mb/nSTwcTuZKqB3DS3ANUIOn7pva8EB6LfxgIL34o4qk3lti/8Mdxqtqc2n4xRszrNdzA==
+  dependencies:
+    "@chainsafe/bls-hd-key" "^0.3.0"
+    "@noble/hashes" "^1.0.0"
+    "@scure/bip39" "^1.0.0"
+
+"@chainsafe/bls@^8.2.0":
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/@chainsafe/bls/-/bls-8.2.0.tgz#6f72c39e5f255435ba1a192b09eef89416bb9c82"
+  integrity sha512-onCMG4K5GRWTHPf5T9DrOLsd5VoiOoL0NEpRoAigXVPqr+Gi2GyOncbvc9Vf4RjhmZGgtIJKKB4WJQbRV9Pddw==
+  dependencies:
+    "@chainsafe/bls-keygen" "^0.4.0"
+    bls-eth-wasm "^1.1.1"
+
 "@coinbase/cdp-sdk@^1.22.0":
   version "1.38.3"
   resolved "https://registry.npmjs.org/@coinbase/cdp-sdk/-/cdp-sdk-1.38.3.tgz"
@@ -940,7 +964,7 @@
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.7.2.tgz"
   integrity sha512-biZ0NUSxyjLLqo6KxEJ1b+C2NAx0wtDoFvCaXHGgUkeHzf3Xc1xKumFKREuT7f7DARNZ/slvYUwFG6B0f2b6hQ==
 
-"@noble/hashes@1.8.0", "@noble/hashes@^1.3.1", "@noble/hashes@^1.4.0", "@noble/hashes@^1.5.0", "@noble/hashes@^1.8.0", "@noble/hashes@~1.8.0":
+"@noble/hashes@1.8.0", "@noble/hashes@^1.0.0", "@noble/hashes@^1.3.1", "@noble/hashes@^1.4.0", "@noble/hashes@^1.5.0", "@noble/hashes@^1.8.0", "@noble/hashes@~1.8.0":
   version "1.8.0"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.8.0.tgz"
   integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
@@ -1618,7 +1642,7 @@
     "@noble/hashes" "~1.7.1"
     "@scure/base" "~1.2.4"
 
-"@scure/bip39@1.6.0", "@scure/bip39@^1.4.0", "@scure/bip39@^1.6.0":
+"@scure/bip39@1.6.0", "@scure/bip39@^1.0.0", "@scure/bip39@^1.4.0", "@scure/bip39@^1.6.0":
   version "1.6.0"
   resolved "https://registry.npmjs.org/@scure/bip39/-/bip39-1.6.0.tgz"
   integrity sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==
@@ -3848,14 +3872,9 @@ blakejs@1.2.1:
   resolved "https://registry.npmjs.org/blakejs/-/blakejs-1.2.1.tgz"
   integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
 
-bls-eth-wasm@^1.0.4, bls-eth-wasm@^1.1.1:
+bls-eth-wasm@^1.0.4, bls-eth-wasm@^1.1.1, bls-eth-wasm@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/bls-eth-wasm/-/bls-eth-wasm-1.4.0.tgz"
-  integrity sha512-9TJR3r3CUJQR97PU6zokV2kVA80H8g4tkVBnaf9HNH3lFMBZUKZETNCwIuN+exFLujdbt1K188rH3mnq8UgmKw==
-
-bls-eth-wasm@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/bls-eth-wasm/-/bls-eth-wasm-1.4.0.tgz#7e68ac6cf897ec6227b15e3567d7c392b5f50f76"
   integrity sha512-9TJR3r3CUJQR97PU6zokV2kVA80H8g4tkVBnaf9HNH3lFMBZUKZETNCwIuN+exFLujdbt1K188rH3mnq8UgmKw==
 
 bn.js@^4.11.9:
