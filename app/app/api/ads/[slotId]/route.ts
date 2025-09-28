@@ -39,7 +39,9 @@ const defaultSlots: Record<string, any> = {
   'production-test-slot': { size: 'banner', width: 728, height: 90 },
   'http-storage-test': { size: 'banner', width: 728, height: 90 },
   'final-production-test': { size: 'banner', width: 728, height: 90 },
-  'fixed-endpoint-test': { size: 'banner', width: 728, height: 90 }
+  'fixed-endpoint-test': { size: 'banner', width: 728, height: 90 },
+  'hash-persistence-test': { size: 'banner', width: 728, height: 90 },
+  'complete-flow-test': { size: 'banner', width: 728, height: 90 }
 };
 
 export async function GET(
