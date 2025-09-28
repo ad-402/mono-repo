@@ -12,7 +12,8 @@ const defaultSlots: Record<string, any> = {
   'footer-banner': { size: 'banner', width: 728, height: 90 },
   'test-persistent': { size: 'banner', width: 728, height: 90 },
   'test-persistent-key': { size: 'banner', width: 728, height: 90 },
-  'test-persistent-final': { size: 'banner', width: 728, height: 90 }
+  'test-persistent-final': { size: 'banner', width: 728, height: 90 },
+  'test-slot-main': { size: 'banner', width: 728, height: 90 }
 };
 
 export async function GET(

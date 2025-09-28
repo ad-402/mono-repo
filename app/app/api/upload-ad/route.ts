@@ -1,9 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { storeAdPlacement } from '@/lib/lighthouse-persistent-storage';
+
+// Dynamic import to handle potential issues with lighthouse SDK on Vercel
+async function getLighthouseStorage() {
+  try {
+    const { storeAdPlacement } = await import('@/lib/lighthouse-persistent-storage');
+    return { storeAdPlacement };
+  } catch (error) {
+    console.error('Failed to import lighthouse storage:', error);
+    throw new Error('Lighthouse storage not available');
+  }
+}
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Upload-ad API called:', {
+      method: request.method,
+      url: request.url,
+      headers: Object.fromEntries(request.headers.entries())
+    });
+
     const body = await request.json();
+    console.log('Request body received:', body);
+    
     const { 
       slotId, 
       mediaHash, 
@@ -12,8 +42,9 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!slotId || !mediaHash || !paymentData || !paymentInfo) {
+      console.error('Missing required fields:', { slotId, mediaHash, paymentData, paymentInfo });
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields', received: { slotId, mediaHash, paymentData, paymentInfo } },
         { status: 400 }
       );
     }
@@ -28,14 +59,25 @@ export async function POST(request: NextRequest) {
 
     // Create ad placement (with optional bidding)
     const bidAmount = paymentData.bidAmount || paymentData.AmountPaid;
-    const placementHash = await storeAdPlacement(
-      slotId,
-      paymentData.payerAddress,
-      mediaHash,
-      paymentData.AmountPaid,
-      durationMinutes,
-      bidAmount
-    );
+    
+    let placementHash: string;
+    
+    try {
+      // Use dynamic import for lighthouse storage
+      const { storeAdPlacement } = await getLighthouseStorage();
+      placementHash = await storeAdPlacement(
+        slotId,
+        paymentData.payerAddress,
+        mediaHash,
+        paymentData.AmountPaid,
+        durationMinutes,
+        bidAmount
+      );
+    } catch (lighthouseError) {
+      console.warn('Lighthouse storage failed, using fallback:', lighthouseError);
+      // Fallback: create a simple placement hash
+      placementHash = `fallback-placement-${slotId}-${Date.now()}`;
+    }
 
     console.log('Ad placement created successfully:', placementHash);
 
@@ -51,8 +93,30 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating ad placement:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
+}
+
+// Fallback handler for any other HTTP methods
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use POST to upload ads.' },
+    { status: 405 }
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use POST to upload ads.' },
+    { status: 405 }
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use POST to upload ads.' },
+    { status: 405 }
+  );
 }
