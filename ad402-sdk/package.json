@@ -1,5 +1,5 @@
 {
-  "name": "@ad402/sdk",
+  "name": "ad402-sdk",
   "version": "1.0.0",
   "description": "Ad402 SDK for Next.js applications - Easy integration of decentralized ad slots",
   "main": "dist/index.js",

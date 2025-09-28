@@ -16,11 +16,11 @@ A powerful, easy-to-use SDK for integrating Ad402 decentralized ad slots into yo
 ## 📦 Installation
 
 ```bash
-npm install @ad402/sdk
+npm install ad402-sdk
 # or
-yarn add @ad402/sdk
+yarn add ad402-sdk
 # or
-pnpm add @ad402/sdk
+pnpm add ad402-sdk
 ```
 
 ## 🎯 Quick Start
@@ -35,7 +35,7 @@ Before using the Ad402 SDK, you'll need:
 
 ```tsx
 // app/layout.tsx or pages/_app.tsx
-import { Ad402Provider } from '@ad402/sdk';
+import { Ad402Provider } from 'ad402-sdk';
 
 export default function RootLayout({
   children,
@@ -64,7 +64,7 @@ export default function RootLayout({
 
 ```tsx
 // app/page.tsx
-import { Ad402Slot } from '@ad402/sdk';
+import { Ad402Slot } from 'ad402-sdk';
 
 export default function HomePage() {
   return (
@@ -100,7 +100,7 @@ export default function HomePage() {
 ### Basic Configuration
 
 ```tsx
-import { Ad402Provider, createDefaultConfig } from '@ad402/sdk';
+import { Ad402Provider, createDefaultConfig } from 'ad402-sdk';
 
 const config = createDefaultConfig('your-website-id', '0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6', {
   apiBaseUrl: 'https://ad402.io',
@@ -204,7 +204,7 @@ const advancedConfig = {
 ### Using the Context
 
 ```tsx
-import { useAd402Context, useAd402Config } from '@ad402/sdk';
+import { useAd402Context, useAd402Config } from 'ad402-sdk';
 
 function MyComponent() {
   const { config, apiBaseUrl } = useAd402Context();
@@ -228,7 +228,7 @@ import {
   generateCheckoutUrl,
   fetchAdData,
   trackAdEvent 
-} from '@ad402/sdk';
+} from 'ad402-sdk';
 
 // Format price for display
 const displayPrice = formatPrice('0.25', 'USDC'); // "0.25 USDC"
