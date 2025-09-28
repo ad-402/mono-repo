@@ -13,9 +13,9 @@ const fontMono = FontMono({
   variable: "--font-mono",
 });
 export const metadata: Metadata = {
-  title: "Solidity Next.js Starter",
+  title: "Ad402",
   description:
-    "A starter kit for building full stack Ethereum dApps with Solidity and Next.js",
+    "A decentralized advertising platform for publishers and advertisers",
 };
 
 export default function RootLayout({
