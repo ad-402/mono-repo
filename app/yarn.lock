@@ -3853,6 +3853,11 @@ bls-eth-wasm@^1.0.4, bls-eth-wasm@^1.1.1:
   resolved "https://registry.npmjs.org/bls-eth-wasm/-/bls-eth-wasm-1.4.0.tgz"
   integrity sha512-9TJR3r3CUJQR97PU6zokV2kVA80H8g4tkVBnaf9HNH3lFMBZUKZETNCwIuN+exFLujdbt1K188rH3mnq8UgmKw==
 
+bls-eth-wasm@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/bls-eth-wasm/-/bls-eth-wasm-1.4.0.tgz#7e68ac6cf897ec6227b15e3567d7c392b5f50f76"
+  integrity sha512-9TJR3r3CUJQR97PU6zokV2kVA80H8g4tkVBnaf9HNH3lFMBZUKZETNCwIuN+exFLujdbt1K188rH3mnq8UgmKw==
+
 bn.js@^4.11.9:
   version "4.12.2"
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-4.12.2.tgz"
