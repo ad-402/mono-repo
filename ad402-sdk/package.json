@@ -1,0 +1,54 @@
+{
+  "name": "@ad402/sdk",
+  "version": "1.0.0",
+  "description": "Ad402 SDK for Next.js applications - Easy integration of decentralized ad slots",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ad402",
+    "advertising",
+    "decentralized",
+    "blockchain",
+    "nextjs",
+    "react",
+    "sdk",
+    "ipfs",
+    "usdc",
+    "bidding"
+  ],
+  "author": "Ad402 Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "next": ">=13.0.0"
+  },
+  "dependencies": {
+    "wagmi": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ad402/mono-repo.git",
+    "directory": "ad402-sdk"
+  },
+  "homepage": "https://ad402.io",
+  "bugs": {
+    "url": "https://github.com/ad402/mono-repo/issues"
+  }
+}
