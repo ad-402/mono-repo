@@ -85,7 +85,9 @@ mono-repo/
     ├── src/                         # Service source code
     └── routes/                      # API routes
 ```
-
+### 🔗 **Links**
+- **Website**: [https://ad402.io](https://ad402.vercel.app)
+- **SDK Package**: [npmjs.com/package/ad402-sdk](https://www.npmjs.com/package/ad402-sdk)
 ## 🚀 **Key Features**
 
 ### 💰 **Payment System**
@@ -384,22 +386,6 @@ We welcome contributions! Here's how to get started:
 ## 📄 **License**
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 **Support & Resources**
-
-### 📖 **Documentation**
-- [SDK Documentation](ad402-sdk/README.md) - Complete SDK integration guide
-- [Deployment Guide](app/PRODUCTION-DEPLOYMENT-GUIDE.md) - Production deployment instructions
-- [API Documentation](app/README-AD402.md) - API endpoints and usage
-
-### 🐛 **Issues & Support**
-- [GitHub Issues](https://github.com/ad402/mono-repo/issues) - Report bugs and request features
-- [Discord Community](https://discord.gg/ad402) - Join our developer community
-- [Email Support](mailto:support@ad402.io) - Direct support contact
-
-### 🔗 **Links**
-- **Website**: [https://ad402.io](https://ad402.vercel.app)
-- **SDK Package**: [npmjs.com/package/ad402-sdk](https://www.npmjs.com/package/ad402-sdk)
 
 
 ## 🎉 **Ready to Get Started?**
