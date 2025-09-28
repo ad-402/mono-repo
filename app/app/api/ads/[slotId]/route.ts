@@ -38,7 +38,8 @@ const defaultSlots: Record<string, any> = {
   'test-fallback-storage': { size: 'banner', width: 728, height: 90 },
   'production-test-slot': { size: 'banner', width: 728, height: 90 },
   'http-storage-test': { size: 'banner', width: 728, height: 90 },
-  'final-production-test': { size: 'banner', width: 728, height: 90 }
+  'final-production-test': { size: 'banner', width: 728, height: 90 },
+  'fixed-endpoint-test': { size: 'banner', width: 728, height: 90 }
 };
 
 export async function GET(

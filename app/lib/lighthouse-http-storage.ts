@@ -106,7 +106,7 @@ async function saveStorageData(data: StorageData): Promise<string> {
     const blob = new Blob([jsonData], { type: 'application/json' });
     formData.append('file', blob, 'ad402-storage.json');
 
-    const response = await fetch('https://api.lighthouse.storage/api/v0/add', {
+    const response = await fetch('https://upload.lighthouse.storage/api/v0/add', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LIGHTHOUSE_API_KEY}`,
