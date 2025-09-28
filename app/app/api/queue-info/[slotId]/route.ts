@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Dynamic import to handle potential issues with lighthouse SDK on Vercel
+// HTTP-based Lighthouse storage to avoid SDK dependencies
 async function getLighthouseStorage() {
   try {
-    const { getQueueInfo } = await import('@/lib/lighthouse-persistent-storage');
+    const { getQueueInfo } = await import('@/lib/lighthouse-http-storage');
     return { getQueueInfo };
   } catch (error) {
-    console.error('Failed to import lighthouse storage:', error);
-    throw new Error('Lighthouse storage not available');
+    console.error('Failed to import lighthouse HTTP storage:', error);
+    throw new Error('Lighthouse HTTP storage not available');
   }
 }
 

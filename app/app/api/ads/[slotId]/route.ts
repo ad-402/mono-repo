@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Dynamic import to handle potential issues with lighthouse SDK on Vercel
+// HTTP-based Lighthouse storage to avoid SDK dependencies
 async function getLighthouseStorage() {
   try {
-    const { getAdPlacement } = await import('@/lib/lighthouse-persistent-storage');
+    const { getAdPlacement } = await import('@/lib/lighthouse-http-storage');
     return { getAdPlacement };
   } catch (error) {
-    console.error('Failed to import lighthouse storage:', error);
-    throw new Error('Lighthouse storage not available');
+    console.error('Failed to import lighthouse HTTP storage:', error);
+    throw new Error('Lighthouse HTTP storage not available');
   }
 }
 
@@ -36,7 +36,9 @@ const defaultSlots: Record<string, any> = {
   'test-persistent-final': { size: 'banner', width: 728, height: 90 },
   'test-slot-main': { size: 'banner', width: 728, height: 90 },
   'test-fallback-storage': { size: 'banner', width: 728, height: 90 },
-  'production-test-slot': { size: 'banner', width: 728, height: 90 }
+  'production-test-slot': { size: 'banner', width: 728, height: 90 },
+  'http-storage-test': { size: 'banner', width: 728, height: 90 },
+  'final-production-test': { size: 'banner', width: 728, height: 90 }
 };
 
 export async function GET(

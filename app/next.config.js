@@ -21,11 +21,13 @@ const nextConfig = {
         querystring: false
       };
       
-      // Don't externalize Lighthouse SDK on server - we want it bundled
+      // Externalize problematic packages
       config.externals.push(
         "pino-pretty", 
         "lokijs", 
-        "encoding"
+        "encoding",
+        "@lighthouse-web3/sdk",
+        "bls-eth-wasm"
       );
     }
     return config;
@@ -36,7 +38,9 @@ const nextConfig = {
     },
   },
   serverExternalPackages: [
-    '@metamask/sdk'
+    '@metamask/sdk',
+    '@lighthouse-web3/sdk',
+    'bls-eth-wasm'
   ],
 };
 
