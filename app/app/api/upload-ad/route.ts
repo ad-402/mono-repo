@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyPayment, type PaymentVerificationParams } from '@/lib/payment-verification';
+import { applyRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
+import { handleCorsPreflightRequest, addCorsHeaders } from '@/lib/cors-config';
+import { PrismaClient } from '@prisma/client';
+import type { Hash, Address } from 'viem';
+
+const prisma = new PrismaClient();
 
 // HTTP-based Lighthouse storage to avoid SDK dependencies
 async function getLighthouseStorage() {
@@ -11,31 +18,23 @@ async function getLighthouseStorage() {
   }
 }
 
-// Fallback storage for when Lighthouse is not available
-async function getFallbackStorage() {
-  try {
-    const { storeAdPlacementFallback } = await import('@/lib/fallback-storage');
-    return { storeAdPlacement: storeAdPlacementFallback };
-  } catch (error) {
-    console.error('Failed to import fallback storage:', error);
-    throw new Error('Fallback storage not available');
-  }
-}
-
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+  return handleCorsPreflightRequest(request);
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply IP-based rate limiting first
+    const ipRateLimitResult = await applyRateLimit(request, {
+      ipLimit: RATE_LIMITS.IP_LIMIT,
+      windowMs: RATE_LIMITS.WINDOW_MS,
+    });
+
+    if (ipRateLimitResult) {
+      return ipRateLimitResult;
+    }
+
     console.log('Upload-ad API called:', {
       method: request.method,
       url: request.url,
@@ -60,9 +59,95 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate payment data structure
+    if (!paymentData.transactionHash || !paymentData.payerAddress || !paymentData.AmountPaid) {
+      console.error('Invalid payment data structure:', paymentData);
+      return NextResponse.json(
+        { error: 'Invalid payment data. Missing transactionHash, payerAddress, or AmountPaid' },
+        { status: 400 }
+      );
+    }
+
+    // Apply wallet-based rate limiting for uploads
+    const walletRateLimitResult = await applyRateLimit(request, {
+      walletAddress: paymentData.payerAddress,
+      walletLimit: RATE_LIMITS.UPLOAD_LIMIT,
+      windowMs: RATE_LIMITS.UPLOAD_WINDOW_MS,
+    });
+
+    if (walletRateLimitResult) {
+      return walletRateLimitResult;
+    }
+
     console.log('Creating ad placement for slot:', slotId);
     console.log('Media hash:', mediaHash);
     console.log('Payment data:', paymentData);
+
+    // Verify payment on blockchain (CRITICAL SECURITY CHECK)
+    const network = (paymentData.network || 'polygon') as 'polygon' | 'polygon-amoy';
+    const publisherWallet = (paymentData.recipientAddress || process.env.PAYMENT_RECIPIENT) as Address;
+
+    if (!publisherWallet) {
+      console.error('No publisher wallet address configured');
+      return NextResponse.json(
+        { error: 'Publisher wallet not configured' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Verifying payment on blockchain...');
+    const verificationResult = await verifyPayment({
+      transactionHash: paymentData.transactionHash as Hash,
+      network,
+      expectedAmount: paymentData.AmountPaid,
+      expectedRecipient: publisherWallet,
+      expectedPayer: paymentData.payerAddress as Address,
+    });
+
+    if (!verificationResult.verified) {
+      console.error('Payment verification failed:', verificationResult.error);
+      return NextResponse.json(
+        {
+          error: 'Payment verification failed',
+          details: verificationResult.error,
+          suggestion: 'Please ensure your transaction was successful and has been confirmed on the blockchain',
+        },
+        { status: 402 } // 402 Payment Required
+      );
+    }
+
+    console.log('Payment verified successfully:', {
+      amount: verificationResult.amount,
+      from: verificationResult.from,
+      to: verificationResult.to,
+      blockNumber: verificationResult.blockNumber,
+    });
+
+    // Get or create publisher
+    let publisher = await prisma.publisher.findUnique({
+      where: { walletAddress: publisherWallet.toLowerCase() },
+    });
+
+    if (!publisher) {
+      publisher = await prisma.publisher.create({
+        data: {
+          walletAddress: publisherWallet.toLowerCase(),
+        },
+      });
+    }
+
+    // Calculate platform fee
+    const platformFeePercentage = parseFloat(process.env.PLATFORM_FEE_PERCENTAGE || '5');
+    const amount = parseFloat(verificationResult.amount!);
+    const platformFee = (amount * platformFeePercentage) / 100;
+    const publisherRevenue = amount - platformFee;
+
+    console.log('Fee calculation:', {
+      amount,
+      platformFeePercentage,
+      platformFee: platformFee.toFixed(6),
+      publisherRevenue: publisherRevenue.toFixed(6),
+    });
 
     // Calculate duration based on payment info or default to 1 hour
     // You can make this configurable based on the selected duration in paymentInfo
@@ -70,9 +155,9 @@ export async function POST(request: NextRequest) {
 
     // Create ad placement (with optional bidding)
     const bidAmount = paymentData.bidAmount || paymentData.AmountPaid;
-    
+
     let placementHash: string;
-    
+
     try {
       // Use dynamic import for lighthouse storage
       const { storeAdPlacement } = await getLighthouseStorage();
@@ -87,48 +172,93 @@ export async function POST(request: NextRequest) {
       console.log('Successfully stored using Lighthouse persistent storage');
     } catch (lighthouseError) {
       console.error('Lighthouse storage failed:', lighthouseError);
-      console.error('This should not happen in production. Check LIGHTHOUSE_API_KEY and network connectivity.');
-      
-      // Only use fallback in development or if absolutely necessary
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Using fallback storage in development mode only');
-        try {
-          const { storeAdPlacement } = await getFallbackStorage();
-          placementHash = await storeAdPlacement(
-            slotId,
-            paymentData.payerAddress,
-            mediaHash,
-            paymentData.AmountPaid,
-            durationMinutes,
-            bidAmount
-          );
-        } catch (fallbackError) {
-          console.error('Fallback storage also failed:', fallbackError);
-          placementHash = `simple-placement-${slotId}-${Date.now()}`;
-        }
-      } else {
-        // In production, fail if Lighthouse doesn't work
-        throw new Error('Lighthouse storage is required for production. Please check your configuration.');
-      }
+
+      // Fail immediately if Lighthouse doesn't work
+      const errorResponse = NextResponse.json(
+        {
+          error: 'Storage service unavailable',
+          details: 'Unable to store ad placement. Please try again later.',
+          technical: lighthouseError instanceof Error ? lighthouseError.message : 'Unknown error',
+        },
+        { status: 503 } // 503 Service Unavailable
+      );
+      return addCorsHeaders(errorResponse, request);
     }
 
     console.log('Ad placement created successfully:', placementHash);
 
-    return NextResponse.json({
+    // Save ad placement to database
+    const startsAt = new Date();
+    const expiresAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
+
+    const adPlacement = await prisma.adPlacement.create({
+      data: {
+        slotId: slotId,
+        publisherId: publisher.id,
+        advertiserWallet: paymentData.payerAddress.toLowerCase(),
+        contentType: 'image', // Could be inferred from mediaHash
+        contentUrl: `https://gateway.lighthouse.storage/ipfs/${mediaHash}`,
+        price: amount,
+        currency: 'USDC',
+        durationMinutes,
+        startsAt,
+        expiresAt,
+        status: placementHash.startsWith('queued-') ? 'queued' : 'active',
+        moderationStatus: 'approved', // Auto-approve for now, can add moderation later
+      },
+    });
+
+    // Save payment record to database
+    const payment = await prisma.payment.create({
+      data: {
+        placementId: adPlacement.id,
+        publisherId: publisher.id,
+        transactionHash: paymentData.transactionHash,
+        blockNumber: Number(verificationResult.blockNumber || 0),
+        amount,
+        currency: 'USDC',
+        network,
+        platformFee,
+        publisherRevenue,
+        status: 'confirmed',
+        verifiedAt: new Date(),
+      },
+    });
+
+    console.log('Payment and placement saved to database:', {
+      placementId: adPlacement.id,
+      paymentId: payment.id,
+    });
+
+    const response = NextResponse.json({
       success: true,
       placement: {
+        id: adPlacement.id,
         hash: placementHash,
         contentUrl: `https://gateway.lighthouse.storage/ipfs/${mediaHash}`,
-        expiresAt: new Date(Date.now() + durationMinutes * 60 * 1000).toISOString()
-      }
+        startsAt: startsAt.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        status: adPlacement.status,
+      },
+      payment: {
+        id: payment.id,
+        transactionHash: payment.transactionHash,
+        amount: amount.toFixed(6),
+        platformFee: platformFee.toFixed(6),
+        publisherRevenue: publisherRevenue.toFixed(6),
+        currency: 'USDC',
+      },
     });
+
+    return addCorsHeaders(response, request);
 
   } catch (error) {
     console.error('Error creating ad placement:', error);
-    return NextResponse.json(
+    const errorResponse = NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
+    return addCorsHeaders(errorResponse, request);
   }
 }
 

@@ -1,13 +1,10 @@
 // HTTP-based Lighthouse storage to avoid SDK dependencies
 // This uses direct HTTP calls to Lighthouse API instead of the SDK
 
+import { getLighthouseHash, updateLighthouseHash } from './storage-config';
+
 // Lighthouse API key
 const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY || process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY;
-const LIGHTHOUSE_STORAGE_HASH_ENV = process.env.LIGHTHOUSE_STORAGE_HASH;
-
-// Known storage hash for the main Ad402 storage
-// This will be updated when new data is uploaded
-let CURRENT_STORAGE_HASH = LIGHTHOUSE_STORAGE_HASH_ENV || 'QmPq7ugnMazhVVVko9ZU7LxFgM7U1Zs3Ly5tat7hMJ8aYA';
 
 export interface StoredPlacement {
   slotId: string;
@@ -57,8 +54,8 @@ async function getStorageData(): Promise<StorageData> {
       throw new Error('Lighthouse API key not configured');
     }
 
-        // Try to fetch from the current storage hash
-        const storageHash = CURRENT_STORAGE_HASH;
+    // Get the current storage hash from database
+    const storageHash = await getLighthouseHash();
     if (!storageHash) {
       // Initialize with empty data if no storage hash exists
       const initialData: StorageData = {
@@ -127,14 +124,14 @@ async function saveStorageData(data: StorageData): Promise<string> {
     
     if (result && result.Hash) {
       const hash = result.Hash;
-      
-      // Update cache and current storage hash
+
+      // Update cache and persist hash to database
       cachedData = data;
       lastFetchTime = Date.now();
-      CURRENT_STORAGE_HASH = hash;
-      
+      await updateLighthouseHash(hash);
+
       console.log(`Storage updated. New hash: ${hash}`);
-      
+
       return hash;
     } else {
       throw new Error('Failed to upload storage data to Lighthouse');

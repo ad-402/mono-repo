@@ -30,24 +30,46 @@ if (!EVM_PRIVATE_KEY && !SVM_PRIVATE_KEY) {
 
 const app = express();
 
-// Disable CORS - Allow all origins
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  credentials: false
-}));
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://ad402.io",
+      "https://www.ad402.io",
+      "https://ad402.vercel.app",
+    ];
+
+// Configure CORS with proper origin checking
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // Allow localhost in development
+      if (process.env.NODE_ENV === "development" && origin.includes("localhost")) {
+        return callback(null, true);
+      }
+
+      // Check whitelist
+      if (ALLOWED_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Log and reject
+      console.warn(`CORS: Blocked origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true,
+  }),
+);
 
 // Configure express to parse JSON bodies
 app.use(express.json());
-
-// Add explicit OPTIONS handler for preflight requests
-app.options('*', (req: Request, res: Response) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.sendStatus(200);
-});
 
 type VerifyRequest = {
   paymentPayload: PaymentPayload;
@@ -66,9 +88,9 @@ app.get("/", (req: Request, res: Response) => {
     endpoints: {
       verify: "/verify",
       settle: "/settle",
-      supported: "/supported"
+      supported: "/supported",
     },
-    status: "running"
+    status: "running",
   });
 });
 
@@ -86,9 +108,11 @@ app.get("/verify", (req: Request, res: Response) => {
 app.post("/verify", async (req: Request, res: Response) => {
   try {
     console.log("Verify request received:", JSON.stringify(req.body, null, 2));
-    
+
     const body: VerifyRequest = req.body;
-    const paymentRequirements = PaymentRequirementsSchema.parse(body.paymentRequirements);
+    const paymentRequirements = PaymentRequirementsSchema.parse(
+      body.paymentRequirements,
+    );
     const paymentPayload = PaymentPayloadSchema.parse(body.paymentPayload);
 
     console.log("Parsed paymentRequirements:", paymentRequirements);
@@ -108,7 +132,6 @@ app.post("/verify", async (req: Request, res: Response) => {
     // verify
     const valid = await verify(client, paymentPayload, paymentRequirements);
     console.log("Verification result:", valid);
-    
     res.json(valid);
   } catch (error) {
     console.error("Verification error:", error);
@@ -161,7 +184,6 @@ app.get("/supported", async (req: Request, res: Response) => {
     // }
 
     console.log("Supported payment kinds:", kinds);
-    
     res.json({
       kinds,
     });
@@ -174,9 +196,10 @@ app.get("/supported", async (req: Request, res: Response) => {
 app.post("/settle", async (req: Request, res: Response) => {
   try {
     console.log("Settle request received:", JSON.stringify(req.body, null, 2));
-    
     const body: SettleRequest = req.body;
-    const paymentRequirements = PaymentRequirementsSchema.parse(body.paymentRequirements);
+    const paymentRequirements = PaymentRequirementsSchema.parse(
+      body.paymentRequirements,
+    );
     const paymentPayload = PaymentPayloadSchema.parse(body.paymentPayload);
 
     console.log("Parsed paymentRequirements:", paymentRequirements);
@@ -185,10 +208,15 @@ app.post("/settle", async (req: Request, res: Response) => {
     // use the correct private key based on the requested network
     let signer: Signer;
     if (SupportedEVMNetworks.includes(paymentRequirements.network)) {
-      console.log(`Creating EVM signer for network: ${paymentRequirements.network}`);
+      console.log(
+        "Creating EVM signer for network:",
+        paymentRequirements.network,
+      );
       signer = await createSigner(paymentRequirements.network, EVM_PRIVATE_KEY);
     } else if (SupportedSVMNetworks.includes(paymentRequirements.network)) {
-      console.log(`Creating SVM signer for network: ${paymentRequirements.network}`);
+      console.log(
+        `Creating SVM signer for network: ${paymentRequirements.network}`,
+      );
       signer = await createSigner(paymentRequirements.network, SVM_PRIVATE_KEY);
     } else {
       throw new Error(`Invalid network: ${paymentRequirements.network}`);
@@ -199,7 +227,7 @@ app.post("/settle", async (req: Request, res: Response) => {
     // settle
     const response = await settle(signer, paymentPayload, paymentRequirements);
     console.log("Settlement result:", response);
-    
+
     res.json(response);
   } catch (error) {
     console.error("Settlement error:", error);
@@ -216,18 +244,18 @@ app.get("/health", (req: Request, res: Response) => {
     environment: {
       hasEvmKey: !!EVM_PRIVATE_KEY,
       hasSvmKey: !!SVM_PRIVATE_KEY,
-      nodeEnv: process.env.NODE_ENV || 'development'
-    }
+      nodeEnv: process.env.NODE_ENV || "development",
+    },
   });
 });
 
 // Error handling middleware
-app.use((error: Error, req: Request, res: Response, next: any) => {
+app.use((error: Error, req: Request, res: Response, _: unknown) => {
   console.error("Unhandled error:", error);
   res.status(500).json({
     error: "Internal server error",
     message: error.message,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -237,7 +265,7 @@ app.use((req: Request, res: Response) => {
     error: "Not found",
     path: req.path,
     method: req.method,
-    availableEndpoints: ["/", "/verify", "/settle", "/supported", "/health"]
+    availableEndpoints: ["/", "/verify", "/settle", "/supported", "/health"],
   });
 });
 
@@ -248,6 +276,10 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`🔍 Supported networks: http://localhost:${PORT}/supported`);
   console.log(`🌍 CORS: Disabled (allows all origins)`);
-  console.log(`🔑 EVM Private Key: ${EVM_PRIVATE_KEY ? '✅ Configured' : '❌ Missing'}`);
-  console.log(`🔑 SVM Private Key: ${SVM_PRIVATE_KEY ? '✅ Configured' : '❌ Missing'}`);
+  console.log(
+    `🔑 EVM Private Key: ${EVM_PRIVATE_KEY ? "✅ Configured" : "❌ Missing"}`,
+  );
+  console.log(
+    `🔑 SVM Private Key: ${SVM_PRIVATE_KEY ? "✅ Configured" : "❌ Missing"}`,
+  );
 });

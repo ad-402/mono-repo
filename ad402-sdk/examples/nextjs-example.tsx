@@ -2,7 +2,7 @@
 // This example shows how to integrate Ad402 SDK with Next.js App Router
 
 // app/layout.tsx
-import { Ad402Provider } from '@ad402/sdk';
+import { Ad402Provider } from '@ad402-sdk';
 import './globals.css';
 
 export const metadata = {
