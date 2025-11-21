@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { addCorsHeaders } from '@/lib/cors-config';
-
-const prisma = new PrismaClient();
 
 /**
  * Get trending publishers based on recent activity

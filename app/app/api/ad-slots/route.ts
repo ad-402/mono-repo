@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 const createSlotSchema = z.object({
   publisherWallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/),

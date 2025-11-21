@@ -3,9 +3,7 @@
  * Handles persistent storage of configuration values in the database
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const STORAGE_KEYS = {
   LIGHTHOUSE_HASH: 'lighthouse_storage_hash',

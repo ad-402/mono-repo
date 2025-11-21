@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { addCorsHeaders } from '@/lib/cors-config';
 import { applyRateLimit } from '@/lib/rate-limiter';
 import { verifyPayment } from '@/lib/payment-verification';
 import { type Address } from 'viem';
-
-const prisma = new PrismaClient();
 
 /**
  * Create a bid to enter the queue

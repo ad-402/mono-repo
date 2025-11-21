@@ -49,7 +49,10 @@ app.use(
       if (!origin) return callback(null, true);
 
       // Allow localhost in development
-      if (process.env.NODE_ENV === "development" && origin.includes("localhost")) {
+      if (
+        process.env.NODE_ENV === "development" &&
+        origin.includes("localhost")
+      ) {
         return callback(null, true);
       }
 

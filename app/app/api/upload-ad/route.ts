@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyPayment, type PaymentVerificationParams } from '@/lib/payment-verification';
 import { applyRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
 import { handleCorsPreflightRequest, addCorsHeaders } from '@/lib/cors-config';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import type { Hash, Address } from 'viem';
-
-const prisma = new PrismaClient();
 
 // HTTP-based Lighthouse storage to avoid SDK dependencies
 async function getLighthouseStorage() {
@@ -187,13 +185,33 @@ export async function POST(request: NextRequest) {
 
     console.log('Ad placement created successfully:', placementHash);
 
+    // Find the ad slot by slotIdentifier (slotId from request is the identifier, not UUID)
+    const adSlot = await prisma.adSlot.findFirst({
+      where: {
+        publisherId: publisher.id,
+        slotIdentifier: slotId,
+        active: true,
+      },
+    });
+
+    if (!adSlot) {
+      const errorResponse = NextResponse.json(
+        {
+          error: 'Ad slot not found',
+          details: `No active slot found with identifier "${slotId}" for this publisher`,
+        },
+        { status: 404 }
+      );
+      return addCorsHeaders(errorResponse, request);
+    }
+
     // Save ad placement to database
     const startsAt = new Date();
     const expiresAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
 
     const adPlacement = await prisma.adPlacement.create({
       data: {
-        slotId: slotId,
+        slotId: adSlot.id, // Use the UUID from AdSlot, not the string identifier
         publisherId: publisher.id,
         advertiserWallet: paymentData.payerAddress.toLowerCase(),
         contentType: 'image', // Could be inferred from mediaHash

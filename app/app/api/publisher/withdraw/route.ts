@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { addCorsHeaders } from '@/lib/cors-config';
 import { applyRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
-
-const prisma = new PrismaClient();
 
 // Minimum withdrawal amount in USDC
 const MIN_WITHDRAWAL_AMOUNT = 10;
