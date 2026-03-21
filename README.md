@@ -2,14 +2,13 @@
 
 > **A revolutionary Web3 advertising ecosystem that combines blockchain payments, IPFS storage, and competitive bidding for transparent, decentralized ad slot management.**
 
-<<<<<<< HEAD
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Next.js](https://img.shields.io/badge/Next.js-15.2.1-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue)](https://www.typescriptlang.org/)
 [![IPFS](https://img.shields.io/badge/IPFS-Lighthouse-green)](https://lighthouse.storage/)
 [![USDC](https://img.shields.io/badge/Payment-USDC-orange)](https://www.centre.io/)
-=======
->>>>>>> 6b80d8da65cc905e85a652020849f53cb4d27c60
+
 
 ## 🎯 **What is Ad402?**
 
