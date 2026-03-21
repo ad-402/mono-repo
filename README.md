@@ -106,7 +106,6 @@ mono-repo/
 ### 🔗 **Links**
 - **Website**: [https://ad402.io](https://ad402.vercel.app)
 - **SDK Package**: [npmjs.com/package/ad402-sdk](https://www.npmjs.com/package/ad402-sdk)
-## 🚀 **Key Features**
 
 ## 🚀 **Key Features**
 
