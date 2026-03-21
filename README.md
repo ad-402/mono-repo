@@ -19,7 +19,6 @@ Ad402 is a complete **decentralized advertising ecosystem** that revolutionizes 
 - **⚡ Competitive Bidding**: Real-time bidding system for ad slots
 - **📱 Modern UI**: Beautiful, responsive interface with Web3 integration
 - **🛠️ Developer SDK**: Easy integration for any website
-<<<<<<< HEAD
 
 ## 🏆 **Hackathon Achievement**
 
@@ -31,7 +30,6 @@ This project was built as a **complete Web3 advertising solution** demonstrating
 - **Developer-friendly SDK** for easy integration
 
 ## 🏗️ **Architecture Overview**
-=======
 
 ## 🏆 **Hackathon Achievement**
 
@@ -46,7 +44,6 @@ This project was built as a **complete Web3 advertising solution** demonstrating
 
 <img width="639" height="384" alt="SS 2025-09-28 at 09 02 25" src="https://github.com/user-attachments/assets/b8a9e991-52d9-40cd-a9f7-d59bdc2efb5e" />
 
->>>>>>> 6b80d8da65cc905e85a652020849f53cb4d27c60
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -111,7 +108,6 @@ mono-repo/
 - **SDK Package**: [npmjs.com/package/ad402-sdk](https://www.npmjs.com/package/ad402-sdk)
 ## 🚀 **Key Features**
 
-<<<<<<< HEAD
 ## 🚀 **Key Features**
 
 ### 💰 **Payment System**
@@ -120,14 +116,12 @@ mono-repo/
 - **Multi-wallet Support**: MetaMask, WalletConnect, and more
 - **Polygon Network**: Fast, low-cost transactions
 
-=======
 ### 💰 **Payment System**
 - **USDC Payments**: EIP-3009 standard for secure transactions
 - **X402 Protocol**: Micropayment processing
 - **Multi-wallet Support**: MetaMask, WalletConnect, and more
 - **Polygon Network**: Fast, low-cost transactions
 
->>>>>>> 6b80d8da65cc905e85a652020849f53cb4d27c60
 ### 🎯 **Ad Slot Management**
 - **Predefined Sizes**: Banner (728x90), Square (300x250), Mobile (320x60), Sidebar (160x600)
 - **Categories**: Technology, General, Demo slots
@@ -419,7 +413,6 @@ We welcome contributions! Here's how to get started:
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-<<<<<<< HEAD
 ## 🆘 **Support & Resources**
 
 ### 📖 **Documentation**
@@ -436,8 +429,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - **Website**: [https://ad402.io](https://ad402.vercel.app)
 - **SDK Package**: [npmjs.com/package/ad402-sdk](https://www.npmjs.com/package/ad402-sdk)
 
-=======
->>>>>>> 6b80d8da65cc905e85a652020849f53cb4d27c60
 
 ## 🎉 **Ready to Get Started?**
 
@@ -451,8 +442,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 **Ad402** - *Revolutionizing digital advertising through decentralization and blockchain technology.* 🚀
 
-<<<<<<< HEAD
 *Built with ❤️ for the Web3 community*
-=======
-*Built with ❤️ for the Web3 community*
->>>>>>> 6b80d8da65cc905e85a652020849f53cb4d27c60
+
