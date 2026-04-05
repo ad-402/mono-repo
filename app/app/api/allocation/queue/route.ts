@@ -34,19 +34,13 @@ export async function GET(request: NextRequest) {
       return addCorsHeaders(errorResponse, request);
     }
 
-    // Build filter
-    const where: any = {
-      publisherId: publisher.id,
-      status: 'approved', // Only approved bids in queue
-    };
-
-    if (slotType) {
-      where.slotType = slotType;
-    }
-
     // Get queue in priority order (highest bid first, then FIFO)
     const queue = await prisma.bid.findMany({
-      where,
+      where: {
+        publisherId: publisher.id,
+        status: 'approved',
+        ...(slotType ? { slotType } : {}),
+      },
       orderBy: [
         { bidAmount: 'desc' }, // Highest bidders first (priority)
         { approvedAt: 'asc' }, // Then by approval time (FIFO)

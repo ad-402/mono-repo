@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyPayment, type PaymentVerificationParams } from '@/lib/payment-verification';
+import { verifyPayment, isTransactionConfirmed, type PaymentVerificationParams } from '@/lib/payment-verification';
 import { applyRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
 import { handleCorsPreflightRequest, addCorsHeaders } from '@/lib/cors-config';
 import { prisma } from '@/lib/prisma';
@@ -94,10 +94,14 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Verifying payment on blockchain...');
+    // AmountPaid may be in wei (6 decimals) or USDC — normalize to USDC for verification
+    const amountPaid = parseFloat(paymentData.AmountPaid);
+    const expectedAmountUsdc = amountPaid > 1000 ? (amountPaid / 1_000_000).toString() : paymentData.AmountPaid;
+
     const verificationResult = await verifyPayment({
       transactionHash: paymentData.transactionHash as Hash,
       network,
-      expectedAmount: paymentData.AmountPaid,
+      expectedAmount: expectedAmountUsdc,
       expectedRecipient: publisherWallet,
       expectedPayer: paymentData.payerAddress as Address,
     });
@@ -120,6 +124,23 @@ export async function POST(request: NextRequest) {
       to: verificationResult.to,
       blockNumber: verificationResult.blockNumber,
     });
+
+    // Check transaction has enough block confirmations
+    const confirmed = await isTransactionConfirmed(
+      paymentData.transactionHash as Hash,
+      network,
+      2 // Require at least 2 block confirmations
+    );
+
+    if (!confirmed) {
+      return NextResponse.json(
+        {
+          error: 'Transaction not yet confirmed',
+          suggestion: 'Please wait a few moments for your transaction to be confirmed and try again',
+        },
+        { status: 409 }
+      );
+    }
 
     // Get or create publisher
     let publisher = await prisma.publisher.findUnique({

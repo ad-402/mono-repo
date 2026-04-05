@@ -18,12 +18,12 @@ export default function BlogDemo() {
         <article className="prose lg:prose-xl">
           <h1 className="text-4xl font-bold mb-6">The Future of Decentralized Advertising</h1>
           
-          <p className="text-lg text-gray-700 mb-6">
+          <p className="text-lg text-foreground mb-6">
             Welcome to the future of web advertising where publishers get paid instantly and advertisers can place ads without intermediaries. 
             The Ad-402 platform revolutionizes digital advertising by leveraging x402 payments for seamless, decentralized ad placements.
           </p>
           
-          <p className="text-lg text-gray-700 mb-6">
+          <p className="text-lg text-foreground mb-6">
             Traditional advertising networks take significant cuts and have complex approval processes. With Ad-402, publishers can monetize 
             their content instantly, and advertisers can place ads directly using cryptocurrency payments.
           </p>
@@ -41,11 +41,11 @@ export default function BlogDemo() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">How It Works</h2>
           
-          <p className="text-lg text-gray-700 mb-4">
+          <p className="text-lg text-foreground mb-4">
             The Ad-402 platform uses a simple but powerful mechanism:
           </p>
           
-          <ol className="list-decimal list-inside space-y-2 text-lg text-gray-700 mb-6">
+          <ol className="list-decimal list-inside space-y-2 text-lg text-foreground mb-6">
             <li>Publishers register ad slots on their websites</li>
             <li>Advertisers browse available slots and place ads with instant payments</li>
             <li>Ads are displayed immediately after payment confirmation</li>
@@ -54,7 +54,7 @@ export default function BlogDemo() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Benefits for Publishers</h2>
           
-          <ul className="list-disc list-inside space-y-2 text-lg text-gray-700 mb-6">
+          <ul className="list-disc list-inside space-y-2 text-lg text-foreground mb-6">
             <li>Instant monetization of website traffic</li>
             <li>No complex approval processes</li>
             <li>Transparent pricing and revenue sharing</li>
@@ -64,7 +64,7 @@ export default function BlogDemo() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">Benefits for Advertisers</h2>
           
-          <ul className="list-disc list-inside space-y-2 text-lg text-gray-700 mb-6">
+          <ul className="list-disc list-inside space-y-2 text-lg text-foreground mb-6">
             <li>Direct ad placement without intermediaries</li>
             <li>Instant ad activation after payment</li>
             <li>Transparent pricing and placement</li>
@@ -72,7 +72,7 @@ export default function BlogDemo() {
             <li>Real-time analytics and tracking</li>
           </ul>
 
-          <p className="text-lg text-gray-700 mb-6">
+          <p className="text-lg text-foreground mb-6">
             The Ad-402 platform represents a paradigm shift in digital advertising, moving away from centralized control 
             to a decentralized, transparent, and efficient system that benefits both publishers and advertisers.
           </p>

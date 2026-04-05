@@ -59,28 +59,17 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     
-    const where: any = {};
-    
-    if (placementId) {
-      where.placementId = placementId;
-    }
-    
-    if (eventType) {
-      where.eventType = eventType;
-    }
-    
-    if (startDate || endDate) {
-      where.timestamp = {};
-      if (startDate) {
-        where.timestamp.gte = new Date(startDate);
-      }
-      if (endDate) {
-        where.timestamp.lte = new Date(endDate);
-      }
-    }
-    
     const analytics = await prisma.analytics.findMany({
-      where,
+      where: {
+        ...(placementId ? { placementId } : {}),
+        ...(eventType ? { eventType } : {}),
+        ...((startDate || endDate) ? {
+          timestamp: {
+            ...(startDate ? { gte: new Date(startDate) } : {}),
+            ...(endDate ? { lte: new Date(endDate) } : {}),
+          },
+        } : {}),
+      },
       orderBy: {
         timestamp: 'desc'
       },

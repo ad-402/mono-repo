@@ -37,8 +37,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-mono)", "'JetBrains Mono'", "'Courier New'", "monospace"],
-        mono: ["'JetBrains Mono'", "'Courier New'", "monospace"],
+        sans: ["var(--font-space)", "'Space Grotesk'", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "'JetBrains Mono'", "'Courier New'", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

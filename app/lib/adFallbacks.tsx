@@ -13,24 +13,24 @@ export const AdFallbacks = {
   },
 
   createPromotionalAd: (size: string): React.ReactElement => (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded text-center">
+    <div className="bg-accent text-accent-foreground p-4 text-center">
       <h3 className="font-bold">Advertise Here!</h3>
-      <p className="text-sm opacity-90">Reach thousands of users</p>
-      <button className="mt-2 bg-white text-blue-600 px-3 py-1 rounded text-xs font-semibold">
+      <p className="text-sm opacity-80">Reach thousands of users</p>
+      <button className="mt-2 bg-background text-foreground px-3 py-1 text-xs font-semibold border border-border">
         Get Started
       </button>
     </div>
   ),
 
   createPurchaseAd: (route: string, position: number, size: string): React.ReactElement => (
-    <div className="bg-gray-50 border-2 border-dashed border-gray-300 p-4 rounded text-center hover:border-blue-400 transition-colors cursor-pointer">
+    <div className="bg-background border-2 border-dashed border-border p-4 text-center hover:border-accent transition-colors cursor-pointer">
       <div className="text-2xl mb-2">📢</div>
-      <div className="text-sm font-medium text-gray-700 mb-1">Ad Space Available</div>
-      <div className="text-xs text-gray-500 mb-3">
+      <div className="text-sm font-medium text-foreground mb-1">Ad Space Available</div>
+      <div className="text-xs text-muted-foreground mb-3 font-mono">
         {route} • Position {position} • {size}
       </div>
-      <button 
-        className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+      <button
+        className="bg-accent text-accent-foreground px-4 py-2 text-sm font-medium hover:bg-accent/90 transition-colors"
         onClick={() => {
           // Redirect to checkout with slot details
           const params = new URLSearchParams({
@@ -49,14 +49,14 @@ export const AdFallbacks = {
   ),
 
   createLoadingAd: (): React.ReactElement => (
-    <div className="bg-gray-100 rounded flex items-center justify-center">
-      <div className="animate-pulse text-gray-400">Loading ad...</div>
+    <div className="bg-secondary flex items-center justify-center">
+      <div className="animate-pulse text-muted-foreground">Loading ad...</div>
     </div>
   ),
 
   createErrorAd: (error: string): React.ReactElement => (
-    <div className="bg-red-50 border border-red-200 rounded flex items-center justify-center">
-      <div className="text-red-600 text-sm">Failed to load ad: {error}</div>
+    <div className="bg-destructive/10 border border-destructive/30 flex items-center justify-center">
+      <div className="text-destructive text-sm">Failed to load ad: {error}</div>
     </div>
   )
 };

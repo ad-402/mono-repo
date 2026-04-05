@@ -5,9 +5,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -74,10 +72,10 @@ const USDC_CONFIG = {
 } as const;
 
 // X402 endpoint - replace with your actual endpoint
-const X402_ENDPOINT = 'https://polygon-facilitator.vercel.app';
+const X402_ENDPOINT = process.env.NEXT_PUBLIC_X402_ENDPOINT || 'https://polygon-facilitator.vercel.app';
 
 // Payment recipient address
-const PAYMENT_RECIPIENT = '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32';
+const PAYMENT_RECIPIENT = process.env.NEXT_PUBLIC_PAYMENT_RECIPIENT || '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32';
 
 function CheckoutPageContent() {
   const router = useRouter();
@@ -238,11 +236,11 @@ function CheckoutPageContent() {
       const paymentData = {
         index: paymentInfo.slotId,
         validUpto: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days
-        txHash: settlementResult.transactionHash || settlementResult.hash,
+        transactionHash: settlementResult.transactionHash || settlementResult.hash,
         AmountPaid: (parseFloat(finalAmount) * Math.pow(10, signatureData.usdcConfig.decimals)).toString(),
         bidAmount: finalAmount,
         payerAddress: address,
-        recieverAddress: PAYMENT_RECIPIENT
+        recipientAddress: PAYMENT_RECIPIENT
       };
 
       // Store payment data in session storage for the upload page
@@ -408,23 +406,23 @@ function CheckoutPageContent() {
           <Button
             onClick={() => router.back()}
             variant="outline"
-            className="mb-6 font-mono"
+            className="mb-6 font-sans"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-2xl font-mono font-bold text-foreground mb-2">
+          <h1 className="text-2xl font-sans font-bold text-foreground mb-2">
             Purchase Ad Slot
           </h1>
-          <p className="text-muted-foreground font-mono text-sm">
+          <p className="text-muted-foreground font-sans text-sm">
             Complete your payment to secure this ad slot
           </p>
         </div>
 
         {/* Payment Information Card */}
         {paymentInfo && (
-          <Card className="mb-6 border-border bg-card">
-            <CardContent className="p-6">
+          <div className="terminal-card mb-6">
+            <div className="p-6">
               <div className="text-center mb-6">
                 <div className="text-3xl font-mono font-bold text-foreground mb-1">
                   {paymentInfo.price} USDC
@@ -433,7 +431,7 @@ function CheckoutPageContent() {
                   {paymentInfo.slotId} • {paymentInfo.size}
                 </div>
               </div>
-              
+
               <div className="space-y-2 text-sm font-mono">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Slot:</span>
@@ -448,16 +446,16 @@ function CheckoutPageContent() {
                   <span className="text-foreground">Polygon</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Queue Information Card */}
         {queueInfo && (
-          <Card className="mb-6 border-border bg-card">
-            <CardContent className="p-6">
+          <div className="terminal-card mb-6">
+            <div className="p-6">
               <div className="text-center mb-4">
-                <h3 className="font-mono font-semibold text-foreground text-sm mb-2">
+                <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                   {queueInfo.isAvailable ? 'Slot Available' : 'Slot Occupied'}
                 </h3>
                 {!queueInfo.isAvailable && (
@@ -481,29 +479,29 @@ function CheckoutPageContent() {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Bidding Section */}
         {paymentInfo && (
-          <Card className="mb-6 border-border bg-card">
-            <CardContent className="p-6">
+          <div className="terminal-card mb-6">
+            <div className="p-6">
               <div className="space-y-4">
                 <div className="text-center">
-                  <h3 className="font-mono font-semibold text-foreground text-sm mb-2">
+                  <h3 className="font-sans font-semibold text-foreground text-sm mb-2">
                     {isBidding ? 'Bid Amount' : 'Purchase Amount'}
                   </h3>
-                  <p className="text-xs text-muted-foreground font-mono">
-                    {isBidding 
-                      ? 'Higher bids get priority in the queue' 
+                  <p className="text-xs text-muted-foreground font-sans">
+                    {isBidding
+                      ? 'Higher bids get priority in the queue'
                       : 'Slot is available for immediate purchase'
                     }
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bidAmount" className="text-sm font-mono text-foreground">
+                  <Label htmlFor="bidAmount" className="text-sm font-sans text-foreground">
                     Amount (USDC)
                   </Label>
                   <div className="relative">
@@ -521,31 +519,31 @@ function CheckoutPageContent() {
                       USDC
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground font-mono">
+                  <p className="text-xs text-muted-foreground font-sans">
                     Minimum: {paymentInfo.price} USDC
                   </p>
                 </div>
 
                 {isBidding && (
                   <div className="p-3 bg-secondary border border-border">
-                    <p className="text-xs font-mono text-muted-foreground">
-                      💡 <strong>Bidding Tip:</strong> Higher bids get better queue positions. 
+                    <p className="text-xs font-sans text-muted-foreground">
+                      💡 <strong>Bidding Tip:</strong> Higher bids get better queue positions.
                       Your ad will automatically activate when it's your turn.
                     </p>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Wallet Connection Card */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
+        <div className="terminal-card mb-6">
+          <div className="p-6">
             {!isConnected ? (
               <div className="text-center">
                 <WalletIcon className="w-8 h-8 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4 font-mono text-sm">
+                <p className="text-muted-foreground mb-4 font-sans text-sm">
                   Connect your wallet to continue
                 </p>
                 <div className="flex justify-center">
@@ -558,7 +556,7 @@ function CheckoutPageContent() {
                   <div className="flex items-center gap-3">
                     <CheckCircleIcon className="w-4 h-4 text-foreground" />
                     <div>
-                      <p className="font-mono font-medium text-foreground text-sm">Wallet Connected</p>
+                      <p className="font-sans font-medium text-foreground text-sm">Wallet Connected</p>
                       <p className="text-xs text-muted-foreground font-mono">
                         {formatAddress(address || '')}
                       </p>
@@ -569,7 +567,7 @@ function CheckoutPageContent() {
                 {/* Network Info */}
                 {chainId && !isSupportedNetwork() && (
                   <div className="p-3 bg-secondary border border-border">
-                    <p className="text-sm font-mono text-muted-foreground">
+                    <p className="text-sm font-sans text-muted-foreground">
                       ⚠️ Please switch to Polygon network
                     </p>
                   </div>
@@ -580,7 +578,7 @@ function CheckoutPageContent() {
                   <div className="space-y-4">
                     <Button
                       onClick={handleSignAndPay}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
+                      className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-mono h-12"
                       disabled={connectionStatus.type === 'loading' || !isSupportedNetwork()}
                     >
                       {connectionStatus.type === 'loading' 
@@ -594,7 +592,7 @@ function CheckoutPageContent() {
                     <Button
                       onClick={handleDisconnect}
                       variant="outline"
-                      className="w-full font-mono"
+                      className="w-full font-sans"
                     >
                       Disconnect Wallet
                     </Button>
@@ -602,8 +600,8 @@ function CheckoutPageContent() {
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Connection Status */}
         {renderConnectionStatus()}
@@ -618,7 +616,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground font-mono">Loading checkout...</p>
+          <p className="text-muted-foreground font-sans">Loading checkout...</p>
         </div>
       </div>
     }>

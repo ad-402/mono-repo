@@ -54,7 +54,7 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect, onDisco
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Connect Wallet</CardTitle>
+            <CardTitle className="font-sans text-foreground">Connect Wallet</CardTitle>
             <Button
               onClick={onClose}
               variant="ghost"
@@ -63,7 +63,7 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect, onDisco
               <XMarkIcon className="w-4 h-4" />
             </Button>
           </div>
-          <CardDescription>
+          <CardDescription className="font-sans text-muted-foreground">
             Connect your wallet to interact with the Ad402 platform
           </CardDescription>
         </CardHeader>
@@ -74,12 +74,12 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect, onDisco
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent/30">
                 <div className="flex items-center gap-3">
-                  <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                  <CheckCircleIcon className="w-5 h-5 text-accent-foreground" />
                   <div>
-                    <p className="font-semibold text-green-800">Wallet Connected</p>
-                    <p className="text-sm text-green-600 font-mono">
+                    <p className="font-sans font-semibold text-foreground">Wallet Connected</p>
+                    <p className="text-sm text-muted-foreground font-mono">
                       {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
                     </p>
                   </div>
@@ -94,9 +94,9 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect, onDisco
               </div>
 
               {chainId && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-blue-800 text-sm">
-                    <span className="font-semibold">Network:</span> Chain {chainId}
+                <div className="p-3 bg-secondary border border-border">
+                  <p className="font-sans text-foreground text-sm">
+                    <span className="font-semibold">Network:</span> Chain <span className="font-mono">{chainId}</span>
                   </p>
                 </div>
               )}
@@ -104,7 +104,7 @@ export default function WalletConnectModal({ isOpen, onClose, onConnect, onDisco
               <div className="space-y-2">
                 <Button
                   onClick={onClose}
-                  className="w-full"
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 >
                   Continue
                 </Button>

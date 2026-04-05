@@ -101,7 +101,7 @@ function TestUploadPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-8">
           <Button
@@ -112,46 +112,46 @@ function TestUploadPageContent() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Upload Advertisement</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-sans font-bold text-foreground">Upload Advertisement</h1>
+          <p className="text-muted-foreground font-sans mt-2">
             Upload your advertisement content for the purchased slot
           </p>
         </div>
 
         {/* Payment Information Card */}
         {paymentData && (
-          <Card className="mb-6 border-green-200 bg-green-50">
+          <Card className="terminal-card mb-6 border-accent/30">
             <CardHeader>
-              <CardTitle className="text-green-800">Payment Successful</CardTitle>
-              <CardDescription className="text-green-600">
+              <CardTitle className="font-sans text-accent">Payment Successful</CardTitle>
+              <CardDescription className="font-sans text-accent/80">
                 Your payment has been processed. Now upload your advertisement.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <Label className="text-sm font-medium text-green-800">Slot ID</Label>
-                  <p className="text-sm text-green-600 font-mono">{paymentData.slotId}</p>
+                  <Label className="text-sm font-sans font-medium text-foreground">Slot ID</Label>
+                  <p className="text-sm text-muted-foreground font-mono">{paymentData.slotId}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-green-800">Amount Paid</Label>
-                  <p className="text-sm text-green-600 font-bold">{paymentData.price} USDC</p>
+                  <Label className="text-sm font-sans font-medium text-foreground">Amount Paid</Label>
+                  <p className="text-sm text-muted-foreground font-mono font-bold">{paymentData.price} USDC</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-green-800">Size</Label>
-                  <Badge variant="outline" className="text-green-600 border-green-300">
+                  <Label className="text-sm font-sans font-medium text-foreground">Size</Label>
+                  <Badge variant="outline" className="text-muted-foreground border-border">
                     {paymentData.size}
                   </Badge>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-green-800">Network</Label>
-                  <p className="text-sm text-green-600">{paymentData.network}</p>
+                  <Label className="text-sm font-sans font-medium text-foreground">Network</Label>
+                  <p className="text-sm text-muted-foreground font-sans">{paymentData.network}</p>
                 </div>
               </div>
               {paymentData.transactionHash && (
                 <div className="mt-4">
-                  <Label className="text-sm font-medium text-green-800">Transaction Hash</Label>
-                  <p className="text-sm text-green-600 font-mono break-all">{paymentData.transactionHash}</p>
+                  <Label className="text-sm font-sans font-medium text-foreground">Transaction Hash</Label>
+                  <p className="text-sm text-muted-foreground font-mono break-all">{paymentData.transactionHash}</p>
                 </div>
               )}
             </CardContent>
@@ -160,21 +160,21 @@ function TestUploadPageContent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Form */}
-          <Card>
+          <Card className="terminal-card">
             <CardHeader>
-              <CardTitle>Upload Advertisement</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-sans text-foreground">Upload Advertisement</CardTitle>
+              <CardDescription className="font-sans text-muted-foreground">
                 Select your advertisement file to upload to IPFS
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {selectedFile ? (
-                <div className="p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="p-4 border border-border bg-muted">
                   <div className="flex items-center gap-3">
                     {getFileIcon(selectedFile)}
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
-                      <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
+                      <p className="text-sm font-sans font-medium text-foreground">{selectedFile.name}</p>
+                      <p className="text-xs font-mono text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
                     </div>
                     <Button
                       type="button"
@@ -187,13 +187,13 @@ function TestUploadPageContent() {
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-border border-dashed hover:border-muted-foreground transition-colors">
                   <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
+                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <div className="flex text-sm text-muted-foreground">
                       <label
                         htmlFor="file"
-                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                        className="relative cursor-pointer bg-transparent font-sans font-medium text-accent hover:text-accent/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-accent"
                       >
                         <span>Select a file</span>
                         <input
@@ -205,7 +205,7 @@ function TestUploadPageContent() {
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground font-sans">
                       Images, Videos, Text files up to 100MB
                     </p>
                   </div>
@@ -215,7 +215,7 @@ function TestUploadPageContent() {
               <Button
                 onClick={handleUpload}
                 disabled={!selectedFile || uploading || !paymentData}
-                className="w-full"
+                className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-sans"
               >
                 {uploading ? 'Uploading...' : 'Upload Advertisement'}
               </Button>
@@ -223,60 +223,60 @@ function TestUploadPageContent() {
           </Card>
 
           {/* Results */}
-          <Card>
+          <Card className="terminal-card">
             <CardHeader>
-              <CardTitle>Upload Results</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-sans text-foreground">Upload Results</CardTitle>
+              <CardDescription className="font-sans text-muted-foreground">
                 View the upload results and file information
               </CardDescription>
             </CardHeader>
             <CardContent>
               {error && (
-                <div className="mb-4 p-4 border border-red-200 bg-red-50 rounded-md">
-                  <div className="flex items-center gap-2 text-red-600">
+                <div className="mb-4 p-4 border border-destructive/30 bg-destructive/10">
+                  <div className="flex items-center gap-2 text-destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <span className="font-medium">Error</span>
+                    <span className="font-sans font-medium">Error</span>
                   </div>
-                  <p className="text-red-600 mt-1">{error}</p>
+                  <p className="text-destructive font-sans mt-1">{error}</p>
                 </div>
               )}
 
               {uploadResult && (
                 <div className="space-y-4">
-                  <div className="p-4 border border-green-200 bg-green-50 rounded-md">
-                    <div className="flex items-center gap-2 text-green-600">
+                  <div className="p-4 border border-accent/30 bg-accent/10">
+                    <div className="flex items-center gap-2 text-accent">
                       <CheckCircle className="h-4 w-4" />
-                      <span className="font-medium">Upload Successful!</span>
+                      <span className="font-sans font-medium">Upload Successful!</span>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Submission ID</Label>
-                      <p className="text-sm font-mono">{uploadResult.submission.id}</p>
+                      <Label className="text-sm font-sans font-medium text-muted-foreground">Submission ID</Label>
+                      <p className="text-sm font-mono text-foreground">{uploadResult.submission.id}</p>
                     </div>
 
                     {uploadResult.submission.fileUpload && (
                       <>
                         <div>
-                          <Label className="text-sm font-medium text-gray-500">IPFS Hash</Label>
-                          <p className="text-sm font-mono break-all">{uploadResult.submission.fileUpload.hash}</p>
+                          <Label className="text-sm font-sans font-medium text-muted-foreground">IPFS Hash</Label>
+                          <p className="text-sm font-mono text-foreground break-all">{uploadResult.submission.fileUpload.hash}</p>
                         </div>
 
                         <div>
-                          <Label className="text-sm font-medium text-gray-500">File URL</Label>
+                          <Label className="text-sm font-sans font-medium text-muted-foreground">File URL</Label>
                           <a
                             href={uploadResult.submission.fileUpload.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-800 break-all"
+                            className="text-sm text-accent hover:text-accent/80 break-all"
                           >
                             {uploadResult.submission.fileUpload.url}
                           </a>
                         </div>
 
                         <div>
-                          <Label className="text-sm font-medium text-gray-500">File Info</Label>
+                          <Label className="text-sm font-sans font-medium text-muted-foreground">File Info</Label>
                           <div className="flex gap-2 mt-1">
                             <Badge variant="secondary">{uploadResult.submission.fileUpload.fileName}</Badge>
                             <Badge variant="outline">{formatFileSize(uploadResult.submission.fileUpload.fileSize)}</Badge>
@@ -287,7 +287,7 @@ function TestUploadPageContent() {
                     )}
 
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Status</Label>
+                      <Label className="text-sm font-sans font-medium text-muted-foreground">Status</Label>
                       <Badge variant="secondary" className="mt-1">
                         {uploadResult.submission.status}
                       </Badge>
@@ -297,10 +297,10 @@ function TestUploadPageContent() {
               )}
 
               {!error && !uploadResult && (
-                <div className="text-center text-gray-500 py-8">
-                  <Upload className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                  <p>No upload results yet</p>
-                  <p className="text-sm">Upload a file to see results here</p>
+                <div className="text-center text-muted-foreground py-8">
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground/50 mb-2" />
+                  <p className="font-sans">No upload results yet</p>
+                  <p className="text-sm font-sans">Upload a file to see results here</p>
                 </div>
               )}
             </CardContent>

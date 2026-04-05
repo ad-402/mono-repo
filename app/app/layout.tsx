@@ -2,20 +2,26 @@ import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import type { Metadata } from "next";
-import { JetBrains_Mono as FontMono } from "next/font/google";
-import { Providers } from "@/components/Providers";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { ClientProviders } from "@/components/ClientProviders";
 import { Header } from "@/components/Header";
 import { ToastContainer } from "react-toastify";
 import { cn } from "@/lib/utils";
 
-const fontMono = FontMono({
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space",
+});
+
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
+
 export const metadata: Metadata = {
-  title: "Ad402",
+  title: "AD-402 — Decentralized Advertising Protocol",
   description:
-    "A decentralized advertising platform for publishers and advertisers",
+    "The open advertising standard for AI agents and humans. Publishers monetize. Advertisers reach. Any payment rail. Anywhere.",
 };
 
 export default function RootLayout({
@@ -24,19 +30,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body
         className={cn(
-          "min-h-screen bg-background font-mono antialiased",
-          fontMono.variable,
+          "grain min-h-screen bg-background font-sans antialiased",
         )}
       >
-        <Providers>
+        <ClientProviders>
           <Header />
           <main>
             {children}
           </main>
-        </Providers>
+        </ClientProviders>
         <ToastContainer />
       </body>
     </html>

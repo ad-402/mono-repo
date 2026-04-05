@@ -34,29 +34,21 @@ export async function GET(request: NextRequest) {
       return addCorsHeaders(errorResponse, request);
     }
 
-    // Build filter conditions
-    const where: any = {
+    const paymentWhere = {
       publisherId: publisher.id,
+      ...(status ? { status } : {}),
+      ...((startDate || endDate) ? {
+        createdAt: {
+          ...(startDate ? { gte: new Date(startDate) } : {}),
+          ...(endDate ? { lte: new Date(endDate) } : {}),
+        },
+      } : {}),
     };
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (startDate || endDate) {
-      where.createdAt = {};
-      if (startDate) {
-        where.createdAt.gte = new Date(startDate);
-      }
-      if (endDate) {
-        where.createdAt.lte = new Date(endDate);
-      }
-    }
 
     // Get transactions with pagination
     const [transactions, totalCount] = await Promise.all([
       prisma.payment.findMany({
-        where,
+        where: paymentWhere,
         orderBy: { createdAt: 'desc' },
         take: limit,
         skip: offset,
@@ -74,7 +66,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      prisma.payment.count({ where }),
+      prisma.payment.count({ where: paymentWhere }),
     ]);
 
     // Format transactions

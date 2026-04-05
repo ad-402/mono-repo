@@ -35,21 +35,17 @@ export async function GET(request: NextRequest) {
       return addCorsHeaders(errorResponse, request);
     }
 
-    // Build filter for pending bids
-    const where: any = {
+    const bidWhere = {
       publisherId: publisher.id,
-      status: 'pending_approval',
-      paymentVerified: true, // Only show bids with verified payment
+      status: 'pending_approval' as const,
+      paymentVerified: true,
+      ...(slotType ? { slotType } : {}),
     };
-
-    if (slotType) {
-      where.slotType = slotType;
-    }
 
     // Get pending bids sorted by amount (highest first)
     const [bids, totalCount] = await Promise.all([
       prisma.bid.findMany({
-        where,
+        where: bidWhere,
         orderBy: [
           { bidAmount: 'desc' }, // Highest bidders first
           { createdAt: 'asc' },  // Then by time (FIFO)
@@ -57,7 +53,7 @@ export async function GET(request: NextRequest) {
         take: limit,
         skip: offset,
       }),
-      prisma.bid.count({ where }),
+      prisma.bid.count({ where: bidWhere }),
     ]);
 
     // Format bids for publisher review

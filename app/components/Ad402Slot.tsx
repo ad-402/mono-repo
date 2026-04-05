@@ -194,7 +194,7 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontFamily: 'JetBrains Mono, monospace',
+                    fontFamily: 'var(--font-mono, JetBrains Mono), monospace',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                     transition: 'all 0.2s ease',
                     zIndex: 10,
@@ -248,7 +248,7 @@ export const Ad402Slot: React.FC<Ad402SlotProps> = ({
         style={{ 
           textAlign: 'center', 
           color: 'hsl(var(--foreground))',
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'var(--font-mono, JetBrains Mono), monospace',
           width: '100%',
           height: '100%',
           display: 'flex',

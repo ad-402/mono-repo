@@ -22,19 +22,15 @@ export async function GET(request: NextRequest) {
       return addCorsHeaders(errorResponse, request);
     }
 
-    // Build filter
-    const where: any = {
+    const bidWhere = {
       advertiserWallet: advertiserWallet.toLowerCase(),
+      ...(status ? { status } : {}),
     };
-
-    if (status) {
-      where.status = status;
-    }
 
     // Get bids
     const [bids, totalCount] = await Promise.all([
       prisma.bid.findMany({
-        where,
+        where: bidWhere,
         include: {
           publisher: {
             select: {
@@ -56,7 +52,7 @@ export async function GET(request: NextRequest) {
         take: limit,
         skip: offset,
       }),
-      prisma.bid.count({ where }),
+      prisma.bid.count({ where: bidWhere }),
     ]);
 
     // Format bids

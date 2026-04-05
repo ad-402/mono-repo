@@ -45,17 +45,17 @@ const Greeting = () => {
   return (
     <div className="space-y-8">
       <div className="flex flex-col space-y-4">
-        <p className="text-sm text-gray-500 text-center">
+        <p className="text-sm text-muted-foreground text-center">
           Greeting from the blockchain:
         </p>
         {getGreetingLoading ? (
-          <p className="text-lg text-center text-gray-500 italic">Loading...</p>
+          <p className="text-lg text-center text-muted-foreground italic">Loading...</p>
         ) : (
           <p
             className={
               !getGreetingError
                 ? `text-lg text-center`
-                : `text-lg text-center text-red-500`
+                : `text-lg text-center text-destructive`
             }
           >
             {!getGreetingError
@@ -75,7 +75,7 @@ const Greeting = () => {
             value={newGreeting}
           />
           <button
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 px-8 rounded-md"
+            className="bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-accent-foreground py-4 px-8"
             onClick={setGreeting}
             disabled={
               !address ||
@@ -90,24 +90,24 @@ const Greeting = () => {
           </button>
           {!address && (
             <button
-              className="text-sm text-gray-500 text-center underline hover:opacity-80"
+              className="text-sm text-muted-foreground text-center underline hover:opacity-80"
               onClick={openConnectModal}
             >
               Connect your wallet to set a new greeting
             </button>
           )}
           {address && !newGreeting && (
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm text-muted-foreground text-center">
               Type something to set a new greeting
             </p>
           )}
           {setGreetingError && (
-            <p className="text-sm text-red-500 text-center">
+            <p className="text-sm text-destructive text-center">
               There was an error setting your new greeting
             </p>
           )}
           {newGreeting && prepareSetGreetingError && (
-            <p className="text-sm text-red-500 text-center">
+            <p className="text-sm text-destructive text-center">
               Sorry, only the contract owner can set a greeting
             </p>
           )}

@@ -56,11 +56,12 @@ interface PaymentInfo {
 interface PaymentData {
   index: string;
   validUpto: number;
-  txHash: string;
+  transactionHash: string;
   AmountPaid: string;
   bidAmount?: string;
   payerAddress: string;
-  recieverAddress: string;
+  recipientAddress: string;
+  network: string;
 }
 
 // Database endpoint
@@ -94,11 +95,12 @@ function UploadPageContent() {
       setPaymentData({
         index: `${slotId}-${Date.now()}`, // Generate unique index
         validUpto,
-        txHash: transactionHash || `pending-${Date.now()}`, // Use pending if no tx hash
+        transactionHash: transactionHash || `pending-${Date.now()}`, // Use pending if no tx hash
         AmountPaid: bidAmount || price, // Use bid amount if provided, otherwise use base price
         bidAmount: bidAmount || undefined, // Store bid amount separately
         payerAddress: walletAddress,
-        recieverAddress: '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32' // Your recipient address
+        recipientAddress: process.env.NEXT_PUBLIC_PAYMENT_RECIPIENT || '0x6d63C3DD44983CddEeA8cB2e730b82daE2E91E32', // Your recipient address
+        network: network || 'polygon',
       });
       
       setPaymentInfo({
@@ -268,7 +270,7 @@ function UploadPageContent() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin h-12 w-12 border-2 border-primary border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground font-mono">Loading payment information...</p>
+          <p className="text-muted-foreground font-sans">Loading payment information...</p>
         </div>
       </div>
     );
@@ -282,25 +284,25 @@ function UploadPageContent() {
           <Button
             onClick={() => router.back()}
             variant="outline"
-            className="mb-6 font-mono"
+            className="mb-6 font-sans"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-2xl font-mono font-bold text-foreground mb-2">
+          <h1 className="text-2xl font-sans font-bold text-foreground mb-2">
             Upload Your Ad
           </h1>
-          <p className="text-muted-foreground font-mono text-sm">
+          <p className="text-muted-foreground font-sans text-sm">
             Upload your ad content to complete the process
           </p>
         </div>
 
         {/* Payment Summary Card */}
-        <Card className="mb-6 border-border bg-card">
+        <Card className="mb-6 terminal-card">
           <CardContent className="p-6">
             <div className="text-center mb-4">
               <CheckCircleIcon className="w-6 h-6 text-foreground mx-auto mb-2" />
-              <h3 className="font-mono font-semibold text-foreground text-sm">Payment Confirmed</h3>
+              <h3 className="font-sans font-semibold text-foreground text-sm">Payment Confirmed</h3>
             </div>
             
             <div className="space-y-2 text-sm font-mono">
@@ -338,10 +340,10 @@ function UploadPageContent() {
                 onClick={() => document.getElementById('fileInput')?.click()}
               >
                 <CloudUploadIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-sm font-mono font-medium text-foreground mb-2">
+                <p className="text-sm font-sans font-medium text-foreground mb-2">
                   Drop your image here or click to browse
                 </p>
-                <p className="text-xs text-muted-foreground font-mono">
+                <p className="text-xs text-muted-foreground font-sans">
                   JPG, PNG, GIF up to 5MB
                 </p>
                 <input
@@ -367,7 +369,7 @@ function UploadPageContent() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="font-mono text-xs"
+                      className="font-sans text-xs"
                       onClick={() => {
                         setSelectedFile(null);
                         setPreviewUrl(null);
@@ -391,7 +393,7 @@ function UploadPageContent() {
                 {/* Upload Button */}
                 <Button
                   onClick={handleUpload}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-sans h-12"
                   disabled={uploadStatus.type === 'uploading' || uploadStatus.type === 'storing'}
                 >
                   {uploadStatus.type === 'uploading' || uploadStatus.type === 'storing' 
@@ -406,21 +408,21 @@ function UploadPageContent() {
 
         {/* Status Messages */}
         {uploadStatus.type !== 'idle' && (
-          <Card className="mb-6 border-border bg-card">
+          <Card className="mb-6 terminal-card">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 {uploadStatus.type === 'success' && <CheckCircleIcon className="w-4 h-4 text-foreground" />}
                 {uploadStatus.type === 'error' && <ExclamationTriangleIcon className="w-4 h-4 text-foreground" />}
-                {(uploadStatus.type === 'uploading' || uploadStatus.type === 'storing') && 
+                {(uploadStatus.type === 'uploading' || uploadStatus.type === 'storing') &&
                   <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent" />
                 }
-                <span className="text-sm font-mono text-foreground">
+                <span className="text-sm font-sans text-foreground">
                   {uploadStatus.message}
                 </span>
               </div>
               
               {uploadStatus.type === 'success' && (
-                <p className="text-xs text-muted-foreground font-mono mt-2">
+                <p className="text-xs text-muted-foreground font-sans mt-2">
                   Your ad is now live!
                 </p>
               )}
@@ -432,7 +434,7 @@ function UploadPageContent() {
         {uploadStatus.type === 'success' && (
           <Button
             onClick={() => router.push('/')}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono h-12"
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-sans h-12"
           >
             Go to Homepage
           </Button>

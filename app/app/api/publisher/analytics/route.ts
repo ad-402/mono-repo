@@ -30,18 +30,12 @@ export async function GET(request: NextRequest) {
       return addCorsHeaders(errorResponse, request);
     }
 
-    // Build filter for placements
-    const placementWhere: any = {
-      publisherId: publisher.id,
-    };
-
-    if (slotId) {
-      placementWhere.slotId = slotId;
-    }
-
     // Get all placements for this publisher
     const placements = await prisma.adPlacement.findMany({
-      where: placementWhere,
+      where: {
+        publisherId: publisher.id,
+        ...(slotId ? { slotId } : {}),
+      },
       select: {
         id: true,
         slotId: true,

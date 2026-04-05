@@ -98,7 +98,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'JetBrains Mono, monospace'
+          fontFamily: 'var(--font-mono, JetBrains Mono), monospace'
         }}
       >
         {AdFallbacks.createLoadingAd()}
@@ -122,7 +122,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'JetBrains Mono, monospace'
+          fontFamily: 'var(--font-mono, JetBrains Mono), monospace'
         }}
       >
         {AdFallbacks.createErrorAd(error)}
